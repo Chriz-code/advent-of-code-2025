@@ -5,7 +5,5 @@ int main(int, char**){
     std::cout << "Hello, from advent-of-code-2025!\n";
 
     Day1 day1;
-    day1.part1();
-    day1.printResult();
-
+    day1.part2()->printResult();
 }

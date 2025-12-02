@@ -3,6 +3,7 @@
 #include <vector>
 #include <sstream>
 #include <string>
+#include <cmath>
 
 using namespace std;
 
@@ -10,82 +11,188 @@ class Day1
 {
 private:
     const string inputFile = "inputs/day1.txt";
-    ifstream inputStream;
+
     int dial = 50;
     int result = 0;
 
-    void solver(string line)
+    ifstream *stream()
+    {
+        ifstream *inputStream = new ifstream(inputFile);
+
+        if (!(*inputStream).is_open())
+        {
+            cout << "Unable to open file" << endl;
+            return nullptr;
+        }
+        return inputStream;
+    }
+
+    int mod2(int a, int m)
+    {
+        return (a % m + m) % m;
+    }
+
+    int loopDial(int value)
+    {
+        return mod2(value, 100);
+    }
+
+    int turnDial(string line)
     {
         int turn = stoi(line.substr(1));
         if (line[0] == 'L')
         {
-            dial -= turn;
+            return -turn;
         }
         else
         {
-            dial += turn;
+            return turn;
         }
+    }
 
-        while(dial >= 100) {
-            dial -= 100;
-        }
-
-        while (dial < 0) {
-            dial = 100 + dial;
-        }
-
-        cout << "The dial is rotated " << line << " to point at ";
+    void landOnZero()
+    {
         if (dial == 0)
         {
             result += 1;
-            cout << "*" << dial << "*";
         }
-        else
-        {
-            cout << dial;
-        }
-        cout << "\n";
     }
 
 public:
-    int part1Test()
+    void reset()
     {
+        dial = 50;
+        result = 0;
+    }
+
+    Day1 *part1Test()
+    {
+        reset();
         stringstream ss("L68\nL30\nR48\nL5\nR60\nL55\nL1\nL99\nR14\nL82");
-        
+
         result = 0;
         dial = 50;
 
         string line;
         while (getline(ss, line, '\n'))
         {
-            solver(line);
-        }
-        return result;
-    }
-
-    // The right answer is 1139
-    Day1* part1()
-    {
-        ifstream inputStream(inputFile);
-
-        if (!inputStream.is_open())
-        {
-            cout << "Unable to open file" << endl;
-            return this;
-        }
-
-        result = 0;
-        dial = 50;
-
-        string line;
-        while (getline(inputStream, line))
-        {
-            solver(line);
+            dial = loopDial(dial + turnDial(line));
+            cout << "The dial is rotated " << line << " to point at ";
+            landOnZero();
+            cout << "\n";
         }
         return this;
     }
 
-    void printResult() {
+    Day1 *part2Test()
+    {
+        reset();
+
+        stringstream ss("L68\nL30\nR48\nL5\nR60\nL55\nL1\nL99\nR14\nL82");
+
+        string line;
+        while (getline(ss, line))
+        {
+            int turn = turnDial(line);
+            if (turn < 0)
+            {
+                for (int i = 0; i > turn; i--)
+                {
+                    int l = loopDial(dial - 1);
+                    if (l == 0)
+                    {
+                        cout << "*" << endl;
+                        result++;
+                    }
+                    dial = l;
+                }
+            }
+            else
+            {
+                for (int i = 0; i < turn; i++)
+                {
+                    int l = loopDial(dial + 1);
+                    if (l == 0)
+                    {
+                        cout << "*" << endl;
+                        result++;
+                    }
+                    dial = l;
+                }
+            }
+
+            cout << "The dial is rotated " << line << " to point at " << dial << endl;
+            cout << "\n";
+        }
+        return this;
+    }
+
+    // The right answer is 1139
+    Day1 *part1()
+    {
+        reset();
+
+        ifstream *input = stream();
+        string line;
+        while (getline(*input, line))
+        {
+            dial = loopDial(dial + turnDial(line));
+            cout << "The dial is rotated " << line << " to point at ";
+            landOnZero();
+            cout << "\n";
+        }
+        (*input).close();
+        return this;
+    }
+
+    // 6546
+    // 6085 --too low
+    // 7756 --too high
+    Day1 *part2()
+    {
+        reset();
+
+        ifstream *input = stream();
+        string line;
+        while (getline(*input, line))
+        {
+            int turn = turnDial(line);
+            if (turn < 0)
+            {
+                for (int i = 0; i > turn; i--)
+                {
+                    int l = loopDial(dial - 1);
+                    if (l == 0)
+                    {
+                        cout << "*" << endl;
+                        result++;
+                    }
+                    dial = l;
+                }
+            }
+            else
+            {
+                for (int i = 0; i < turn; i++)
+                {
+                    int l = loopDial(dial + 1);
+                    if (l == 0)
+                    {
+                        cout << "*" << endl;
+                        result++;
+                    }
+                    dial = l;
+                }
+            }
+
+            cout << "The dial is rotated " << line << " to point at " << dial << endl;
+            cout << "\n";
+        }
+        (*input).close();
+        return this;
+    }
+
+    void printResult()
+    {
         cout << "The result of day1 is " << result << endl;
     }
 };
