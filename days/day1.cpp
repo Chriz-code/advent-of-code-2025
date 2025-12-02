@@ -11,8 +11,10 @@ class Day1
 private:
     const string inputFile = "C:\\GitHub\\advent-of-code-2025\\days\\day1_input.txt";
     ifstream inputStream;
+    int dial = 50;
+    int result = 0;
 
-    void solver(string line, int &dial, int &result)
+    void solver(string line)
     {
         int turn = stoi(line.substr(1));
         if (line[0] == 'L')
@@ -49,35 +51,41 @@ public:
     int part1Test()
     {
         stringstream ss("L68\nL30\nR48\nL5\nR60\nL55\nL1\nL99\nR14\nL82");
+        
+        result = 0;
+        dial = 50;
+
         string line;
-        int result = 0;
-        int dial = 50;
         while (getline(ss, line, '\n'))
         {
-            solver(line, dial, result);
+            solver(line);
         }
         return result;
     }
 
     // The right answer is 1139
-    int part1()
+    Day1* part1()
     {
         ifstream inputStream(inputFile);
 
         if (!inputStream.is_open())
         {
-            cout << "Unable to open file";
-            return 0;
+            cout << "Unable to open file" << endl;
+            return this;
         }
 
-        int result = 0;
-        int dial = 50;
+        result = 0;
+        dial = 50;
 
         string line;
         while (getline(inputStream, line))
         {
-            solver(line, dial, result);
+            solver(line);
         }
-        return result;
+        return this;
+    }
+
+    void printResult() {
+        cout << "The result of day1 is " << result << endl;
     }
 };
