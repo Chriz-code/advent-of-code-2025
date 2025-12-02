@@ -9,5 +9,5 @@ int main(int, char**){
     //day1.part2()->printResult();
 
     Day2 day2;
-    day2.part1();
+    day2.part2();
 }
