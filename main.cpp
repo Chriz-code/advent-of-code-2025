@@ -9,6 +9,3 @@ int main(int, char**){
     day1.printResult();
 
 }
-//16
-//461
-//698

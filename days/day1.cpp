@@ -9,7 +9,7 @@ using namespace std;
 class Day1
 {
 private:
-    const string inputFile = "C:\\GitHub\\advent-of-code-2025\\days\\day1_input.txt";
+    const string inputFile = "inputs/day1.txt";
     ifstream inputStream;
     int dial = 50;
     int result = 0;
