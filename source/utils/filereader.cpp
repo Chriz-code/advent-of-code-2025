@@ -1,6 +1,10 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <sstream>
+
+#ifndef GRANDPARENT_H
+#define GRANDPARENT_H
 
 using namespace std;
 
@@ -28,14 +32,21 @@ public:
     {
         string line;
         string result;
-        while (getline(*stream, line))
+        while (getline(*stream, line, '\n'))
         {
             result += line;
         }
         return result;
     }
 
+    stringstream toStringStream() {
+        stringstream buffer;
+        buffer << (*stream).rdbuf();
+        return buffer;
+    }
+
     ~FileReader() {
         (*stream).close();
     }
 };
+#endif
