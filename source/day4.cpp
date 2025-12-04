@@ -83,6 +83,7 @@ private:
     void markAccessablePapers(charboard& board, int& noAccessablePapers) {
         noAccessablePapers = 0;
         for (int row = 0; row < board.size(); row++) {
+            vector<Position> markups;
             for (int col = 0; col < board[row].size(); col++) {
                 char character = board[row][col];
                 if (character != '@')
@@ -97,14 +98,18 @@ private:
                         col + dir.col,
                     };
                     char neighboor = getNeighboor(board, neighboorPos);
-                    if (neighboor == '@' || neighboor == 'x') {
+                    if (neighboor == '@') {
                         noPaperNeighbours++;
                     }
                 }
                 if (noPaperNeighbours < 4) {
                     noAccessablePapers++;
-                    board[row][col] = 'x';
+                    markups.push_back({row, col});
                 }
+            }
+            
+            for (Position pos : markups) {
+                board[pos.row][pos.col] = 'x';
             }
         }
     }
@@ -145,11 +150,42 @@ public:
         printBoard(puzzle);
         cout << string(puzzle[0].size(), '-') << endl;
         int result = 0;
-        int collected = -1;
-        while (collected != 0) {
-            markAccessablePapers(puzzle, result);
+        int collected = 0;
+        while (true) {
+            markAccessablePapers(puzzle, collected);
             result += collected;
+            cout << "Collected: " << collected << endl;
+            if (collected == 0) {
+                break;
+            }
         }
         printBoard(puzzle);
+        cout << "I forked up " << result << endl;
+        return this;
+    }
+
+    // 9609
+    Day4 *part2() {
+        FileReader reader("inputs/day4.txt");
+        charboard puzzle = createPuzzle(reader.toStringStream());
+        
+        printBoard(puzzle);
+        cout << string(puzzle[0].size(), '-') << endl;
+        
+        int result = 0;
+        int collected = 0;
+        while (true) {
+            markAccessablePapers(puzzle, collected);
+            result += collected;
+            cout << "Collected: " << collected << endl;
+            if (collected == 0) {
+                break;
+            }
+        }
+        
+        printBoard(puzzle);
+        cout << "I forked up " << result << endl;
+        
+        return this;
     }
 };
