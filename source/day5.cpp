@@ -6,6 +6,7 @@
 #include <string>
 #include <algorithm>
 #include <functional>
+#include <map>
 
 using namespace std;
 
@@ -17,8 +18,9 @@ private:
         "10-14\n"
         "16-20\n"
         "12-18\n"
-        //"20-21\n"
-        //"10-21\n"
+        "20-20\n"
+        //"10-16\n"
+        "30-31\n"
         "\n"
         "1\n"
         "5\n"
@@ -121,25 +123,44 @@ private:
     long long countRange(vector<Range> ranges)
     {
         long long result = 0;
-        Range prev = ranges[0];
-        for (Range current : ranges)
-        {
-            cout << current.start << "-" << current.end << endl;
-            result += (current.end - current.start) + 1;
 
-            long long prevDiff = 0;
-            if (current != prev)
+        for (int idx = 0; idx < ranges.size(); idx++)
+        {
+            Range current = ranges[idx];
+            cout << current.start << "-" << current.end << endl;
+
+            result += (current.end - current.start) + 1;
+            if (idx > 0)
             {
-                if (current.start <= prev.end && current.start >= prev.start)
+                Range prev = ranges[idx - 1];
+                if (current.start <= prev.end)
                 {
-                    prevDiff = (prev.end - current.start) + 1;
+                    long long prevDiff = (prev.end - current.start) + 1;
                     result -= prevDiff;
-                    cout << "remove: " << prevDiff << endl;;
+                    cout << "removed: " << prevDiff << endl;
                 }
             }
-            prev = current;
         }
         return result;
+    }
+
+    vector<Range> mergeRanges(vector<Range> ranges)
+    {
+        vector<Range> merged;
+        vector<Range>::iterator current = ranges.begin();
+        Range prev = *current;
+        current++;
+        while (current != ranges.end()) {
+            if (prev.end >= current->start) {
+                prev.end = max(prev.end, current->end);
+            } else {
+                merged.push_back(prev);
+                prev = *current;
+            }
+            current++;
+        }
+        merged.push_back(prev);
+        return merged;
     }
 
 public:
@@ -209,9 +230,37 @@ public:
         }
 
         sortRanges(ranges);
-        int result = countRange(ranges);
+        long long result = countRange(ranges);
 
         cout << "IM SO FRESH " << result << endl;
+        return this;
+    }
+
+    Day5 *part2Test2()
+    {
+        vector<Range> ranges;
+        string line;
+        stringstream ss(TEST_INPUT);
+        while (getline(ss, line))
+        {
+            Range range;
+            if (tryGetRange(line, range))
+            {
+                ranges.push_back(range);
+            }
+        }
+
+        sortRanges(ranges);
+
+        vector<Range> merged = mergeRanges(ranges);
+
+        long long result = 0;
+        for (Range c : merged)
+        {
+            cout << c.start << "-" << c.end << endl;
+            result += (c.end - c.start) + 1;
+        }
+        cout << "I'M SO FRESH " << result << endl;
         return this;
     }
 
@@ -225,10 +274,12 @@ public:
     // 373466901069711 -- Not right
     // 297457446068081 -- Not right
     // 320445705285060 -- Not right
+    // 299302746359206 -- Not right
+    // 299302746359206
+    // 
     Day5 *part2()
     {
         vector<Range> ranges;
-
         string line;
         FileReader reader("inputs/day5.txt");
         while (getline(*reader.stream, line))
@@ -244,6 +295,37 @@ public:
         long long result = countRange(ranges);
 
         cout << "IM SO FRESH " << result << endl;
+        return this;
+    }
+
+    // 299302746359218 -- Not right
+    // 299302746359206
+    // 342433357244012
+    Day5 *part2_2()
+    {
+        vector<Range> ranges;
+        string line;
+        FileReader reader("inputs/day5.txt");
+        while (getline(*reader.stream, line))
+        {
+            Range range;
+            if (tryGetRange(line, range))
+            {
+                ranges.push_back(range);
+            }
+        }
+
+        sortRanges(ranges);
+
+        vector<Range> merged = mergeRanges(ranges);
+
+        long long result = 0;
+        for (Range c : merged)
+        {
+            cout << c.start << "-" << c.end << endl;
+            result += (c.end - c.start) + 1;
+        }
+        cout << "I'M SO FRESH " << result << endl;
         return this;
     }
 };
