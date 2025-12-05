@@ -2,14 +2,9 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include "utils/range.cpp"
 
 using namespace std;
-
-struct Range
-{
-    long long start;
-    long long end;
-};
 
 class Day2
 {

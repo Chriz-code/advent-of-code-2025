@@ -1,10 +1,10 @@
+#ifndef FILEREADER_H
+#define FILEREADER_H
+
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <sstream>
-
-#ifndef GRANDPARENT_H
-#define GRANDPARENT_H
 
 using namespace std;
 
