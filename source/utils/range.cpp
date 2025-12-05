@@ -12,5 +12,13 @@ struct Range
     bool operator > (const Range& r) {
         return start > r.start;
     }
+
+    bool operator == (const Range& r) {
+        return start == r.start && end == r.end;
+    }
+
+    bool operator != (const Range& r) {
+        return !(start == r.start && end == r.end);
+    }
 };
 #endif

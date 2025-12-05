@@ -17,6 +17,8 @@ private:
         "10-14\n"
         "16-20\n"
         "12-18\n"
+        //"20-21\n"
+        //"10-21\n"
         "\n"
         "1\n"
         "5\n"
@@ -107,7 +109,7 @@ private:
         return collapes;
     }
 
-    void sortRanges(vector<Range>& ranges)
+    void sortRanges(vector<Range> &ranges)
     {
         sort(ranges.begin(), ranges.end(),
              [](const Range &struct1, const Range &struct2)
@@ -123,12 +125,18 @@ private:
         for (Range current : ranges)
         {
             cout << current.start << "-" << current.end << endl;
-            if (current.start < prev.end)
-            {
-                result -= (prev.end - current.start);
-            }
             result += (current.end - current.start) + 1;
 
+            long long prevDiff = 0;
+            if (current != prev)
+            {
+                if (current.start <= prev.end && current.start >= prev.start)
+                {
+                    prevDiff = (prev.end - current.start) + 1;
+                    result -= prevDiff;
+                    cout << "remove: " << prevDiff << endl;;
+                }
+            }
             prev = current;
         }
         return result;
@@ -213,7 +221,10 @@ public:
     // 103731696
     // 432172526092597 -- Not right
     // 297457446068081 -- Not right
-    // 297457446068081
+    // 388478108115531 -- Not right
+    // 373466901069711 -- Not right
+    // 297457446068081 -- Not right
+    // 320445705285060 -- Not right
     Day5 *part2()
     {
         vector<Range> ranges;
