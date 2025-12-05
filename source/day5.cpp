@@ -77,9 +77,11 @@ private:
         return chain;
     }
 
-    vector<Range> collapseChain(vector<Range> chain) {
+    vector<Range> collapseChain(vector<Range> chain)
+    {
         vector<Range> collapes;
-        for (int ci = 0; ci < chain.size(); ci++) {
+        for (int ci = 0; ci < chain.size(); ci++)
+        {
             Range c = chain[ci];
             if (collapes.empty())
             {
@@ -87,18 +89,34 @@ private:
                 continue;
             }
             bool swapped = false;
-            for (int coi = 0; coi < collapes.size(); coi++) {
-                if (c.start <= collapes[coi].end) {
+            for (int coi = 0; coi < collapes.size(); coi++)
+            {
+                if (c.start <= collapes[coi].end)
+                {
                     collapes[coi].end = c.end;
                     swapped = true;
                     break;
                 }
             }
-            if (!swapped) {
+            if (!swapped)
+            {
                 collapes.push_back(c);
             }
         }
         return collapes;
+    }
+
+    int countRange(vector<Range> ranges)
+    {
+        int result;
+        Range prev({ranges[0].start, ranges[0].end});
+        for (Range v : ranges)
+        {
+            cout << v.start << ":" << v.end << endl;
+            result += (v.end - v.start) + 1;
+            prev = v;
+        }
+        return result;
     }
 
 public:
@@ -169,23 +187,16 @@ public:
 
         sort(ranges.begin(), ranges.end());
 
-        vector<Range> chain = chainRanges(ranges);
-        vector<Range> collapse = collapseChain(chain);
-
-        int result = 0;
-        for (Range v : collapse)
-        {
-            cout << v.start << ":" << v.end << endl;
-            result += (v.end - v.start) + 1;
-        }
+        int result = countRange(ranges);
 
         cout << "IM SO FRESH " << result << endl;
         return this;
     }
 
-    //1351599951 --Too low
-    //1351599937
-    //1504060042 -- Too low
+    // 1351599951 --Too low
+    // 1351599937
+    // 1504060042 -- Too low
+    // 103731696
     Day5 *part2()
     {
         vector<Range> ranges;
@@ -203,15 +214,7 @@ public:
 
         sort(ranges.begin(), ranges.end());
 
-        vector<Range> chain = chainRanges(ranges);
-        vector<Range> collapse = collapseChain(chain);
-
-        int result = 0;
-        for (Range v : collapse)
-        {
-            cout << v.start << ":" << v.end << endl;
-            result += (v.end - v.start) + 1;
-        }
+        int result = countRange(ranges);
 
         cout << "IM SO FRESH " << result << endl;
         return this;
