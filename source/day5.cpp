@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <functional>
 
 using namespace std;
 
@@ -106,15 +107,29 @@ private:
         return collapes;
     }
 
-    int countRange(vector<Range> ranges)
+    void sortRanges(vector<Range>& ranges)
     {
-        int result;
-        Range prev({ranges[0].start, ranges[0].end});
-        for (Range v : ranges)
+        sort(ranges.begin(), ranges.end(),
+             [](const Range &struct1, const Range &struct2)
+             {
+                 return (struct1.start < struct2.start);
+             });
+    }
+
+    long long countRange(vector<Range> ranges)
+    {
+        long long result = 0;
+        Range prev = ranges[0];
+        for (Range current : ranges)
         {
-            cout << v.start << ":" << v.end << endl;
-            result += (v.end - v.start) + 1;
-            prev = v;
+            cout << current.start << "-" << current.end << endl;
+            if (current.start < prev.end)
+            {
+                result -= (prev.end - current.start);
+            }
+            result += (current.end - current.start) + 1;
+
+            prev = current;
         }
         return result;
     }
@@ -185,8 +200,7 @@ public:
             }
         }
 
-        sort(ranges.begin(), ranges.end());
-
+        sortRanges(ranges);
         int result = countRange(ranges);
 
         cout << "IM SO FRESH " << result << endl;
@@ -197,6 +211,9 @@ public:
     // 1351599937
     // 1504060042 -- Too low
     // 103731696
+    // 432172526092597 -- Not right
+    // 297457446068081 -- Not right
+    // 297457446068081
     Day5 *part2()
     {
         vector<Range> ranges;
@@ -212,9 +229,8 @@ public:
             }
         }
 
-        sort(ranges.begin(), ranges.end());
-
-        int result = countRange(ranges);
+        sortRanges(ranges);
+        long long result = countRange(ranges);
 
         cout << "IM SO FRESH " << result << endl;
         return this;
