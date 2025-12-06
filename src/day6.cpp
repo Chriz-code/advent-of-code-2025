@@ -14,48 +14,90 @@ class Day6
 private:
     const char *TEST_INPUT =
         "123 328  51 64 \n"
-        "45 64  387 23 \n"
-        "6 98  215 314 \n"
-        "*   +   *   + \n";
+        " 45 64  387 23 \n"
+        "  6 98  215 314\n"
+        "*   +   *   +  \n";
 
-    bool isNumber(string& s) {
+    bool isNumber(string &s)
+    {
         istringstream iss(s);
         long long ll;
-        return iss >> noskipws >> ll  && iss.eof();
+        return iss >> noskipws >> ll && iss.eof();
     }
 
     homework getProblems(stringstream &stream)
     {
         homework problems;
-
-        string problemLine;
-        while (getline(stream, problemLine))
+        int row = 0;
+        string rowstr;
+        while (getline(stream, rowstr))
         {
-            string problem;
-            istringstream pstream(problemLine);
-            vector<string> lineOfProblems;
-            while (getline(pstream, problem, ' '))
+            int col = 0;
+            string colstr;
+            istringstream pstream(rowstr);
+            while (getline(pstream, colstr, ' '))
             {
-                if (!problem.empty())
+                if (!colstr.empty())
                 {
-                    // problem.erase(remove_if(problem.begin(), problem.end(), ::isspace));
-                    lineOfProblems.push_back(problem);
+                    if (problems.size() < col + 1)
+                    {
+                        problems.push_back(vector<string>());
+                    }
+                    problems[col].push_back(colstr);
+                    col++;
                 }
             }
-            problems.push_back(lineOfProblems);
+            row++;
         }
 
-        const int SIZE = problems.size();
-        for (int i = 0; i < SIZE; ++i)
+        Printer::print2DVector(problems);
+        return problems;
+    }
+
+    long long performOperation(long long a, long long b, string operation)
+    {
+        if (operation == "*")
         {
-            for (int j = 0; j < SIZE; ++j)
+            return a * b;
+        }
+        if (operation == "+")
+        {
+            return a + b;
+        }
+        if (operation == "-")
+        {
+            return a - b;
+        }
+        if (operation == "/")
+        {
+            return a / b;
+        }
+        return -1;
+    }
+
+    homework getProblemsRTLC(stringstream &stream)
+    {
+        homework problems;
+        int row = 0;
+        string rowstr;
+        while (getline(stream, rowstr))
+        {
+            int col = 0;
+            for (auto colstr : rowstr)
             {
-                if (i < j)
+                if (colstr != ' ')
                 {
-                    swap(problems[i][j], problems[j][i]);
+                    if (problems.size() < col + 1)
+                    {
+                        problems.push_back(vector<string>());
+                    }
+                    problems[col].push_back(string({colstr}));
+                    col++;
                 }
             }
+            row++;
         }
+
         Printer::print2DVector(problems);
         return problems;
     }
@@ -63,14 +105,86 @@ private:
 public:
     Day6 *part1Test()
     {
-        string line;
+        long long total = 0;
+
         stringstream ss(TEST_INPUT);
         homework problems = getProblems(ss);
-
-        for (auto problem : problems) {
-            long long sum = 0;
-
+        for (auto problem : problems)
+        {
+            vector<string>::iterator current = problem.begin();
+            string operation = problem.back();
+            long long sum = stoll(*current);
+            current++;
+            while (current != problem.end())
+            {
+                if (*current != operation)
+                {
+                    sum = performOperation(sum, stoll(*current), operation);
+                }
+                current++;
+            }
+            total += sum;
         }
+
+        cout << "Mathematical! " << total << endl;
+
+        return this;
+    }
+
+    Day6 *part1()
+    {
+        long long total = 0;
+
+        FileReader reader("inputs/day6.txt");
+        stringstream stream = reader.toStringStream();
+
+        homework problems = getProblems(stream);
+        for (auto problem : problems)
+        {
+            vector<string>::iterator current = problem.begin();
+            string operation = problem.back();
+            long long sum = stoll(*current);
+            current++;
+            while (current != problem.end())
+            {
+                if (*current != operation)
+                {
+                    sum = performOperation(sum, stoll(*current), operation);
+                }
+                current++;
+            }
+            total += sum;
+        }
+
+        cout << "Mathematical! " << total << endl;
+
+        return this;
+    }
+
+    Day6 *part2Test()
+    {
+        long long total = 0;
+
+        stringstream ss(TEST_INPUT);
+        homework problems = getProblemsRTLC(ss);
+        for (auto problem : problems)
+        {
+            vector<string>::iterator current = problem.begin();
+            string operation = problem.back();
+            long long sum = stoll(*current);
+            current++;
+            while (current != problem.end())
+            {
+                if (*current != operation)
+                {
+                    sum = performOperation(sum, stoll(*current), operation);
+                }
+                current++;
+            }
+            total += sum;
+        }
+
+        cout << "Mathematical! " << total << endl;
 
         return this;
     }

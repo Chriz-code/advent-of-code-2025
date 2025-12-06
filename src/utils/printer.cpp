@@ -17,7 +17,7 @@ class Printer {
                     cout << *y << ", ";
                 }
             }
-            cout << "]";
+            cout << "]" << endl;
         }
     }
 };
