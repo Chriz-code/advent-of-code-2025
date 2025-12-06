@@ -77,26 +77,49 @@ private:
 
     homework getProblemsRTLC(stringstream &stream)
     {
-        homework problems;
-        int row = 0;
+        vector<string> grid;
         string rowstr;
         while (getline(stream, rowstr))
         {
-            int col = 0;
-            for (auto colstr : rowstr)
-            {
-                if (colstr != ' ')
-                {
-                    if (problems.size() < col + 1)
-                    {
-                        problems.push_back(vector<string>());
-                    }
-                    problems[col].push_back(string({colstr}));
-                    col++;
-                }
-            }
-            row++;
+            grid.push_back(rowstr);
         }
+
+        homework problems = homework({vector<string>()});
+        
+        string sign;
+        vector<string> numbers;
+
+        int colSize = grid[0].length();
+        for (int col = 0; col < colSize; col++)
+        {
+            string number;
+            for (int row = 0; row < grid.size(); row++)
+            {
+                if (grid[row][col] == ' ')
+                {
+                    continue;
+                }
+
+                string s = string({grid[row][col]});
+                if (isNumber(s))
+                {
+                    number += s;
+                    continue;
+                }
+                sign = s;
+            }
+            if (number.empty())
+            {
+                problems.back().push_back(sign);
+                problems.push_back(vector<string>());
+            }
+            else
+            {
+                problems.back().push_back(number);
+            }
+        }
+        // Last column is not empty
+        problems.back().push_back(sign);
 
         Printer::print2DVector(problems);
         return problems;
@@ -167,6 +190,36 @@ public:
 
         stringstream ss(TEST_INPUT);
         homework problems = getProblemsRTLC(ss);
+        for (auto problem : problems)
+        {
+            vector<string>::iterator current = problem.begin();
+            string operation = problem.back();
+            long long sum = stoll(*current);
+            current++;
+            while (current != problem.end())
+            {
+                if (*current != operation)
+                {
+                    sum = performOperation(sum, stoll(*current), operation);
+                }
+                current++;
+            }
+            total += sum;
+        }
+
+        cout << "Mathematical! " << total << endl;
+
+        return this;
+    }
+
+    Day6 *part2()
+    {
+        long long total = 0;
+
+        FileReader reader("inputs/day6.txt");
+        stringstream stream = reader.toStringStream();
+
+        homework problems = getProblemsRTLC(stream);
         for (auto problem : problems)
         {
             vector<string>::iterator current = problem.begin();
