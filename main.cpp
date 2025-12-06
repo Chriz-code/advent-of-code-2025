@@ -1,9 +1,9 @@
-#include "source/day1.cpp"
-#include "source/day2.cpp"
-#include "source/day3.cpp"
-#include "source/day4.cpp"
-#include "source/day5.cpp"
-#include "source/day6.cpp"
+#include "src/day1.cpp"
+#include "src/day2.cpp"
+#include "src/day3.cpp"
+#include "src/day4.cpp"
+#include "src/day5.cpp"
+#include "src/day6.cpp"
 
 int main(int, char**){
     std::cout << "Hello, from advent-of-code-2025!\n";
