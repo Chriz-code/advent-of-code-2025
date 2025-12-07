@@ -4,6 +4,7 @@
 #include "src/day4.cpp"
 #include "src/day5.cpp"
 #include "src/day6.cpp"
+#include "src/day7.cpp"
 
 int main(int, char**){
     std::cout << "Hello, from advent-of-code-2025!\n";
@@ -24,9 +25,12 @@ int main(int, char**){
     //day5.part2();
     //day5.part2_2();
 
-    Day6 day6;
+    //Day6 day6;
     //day6.part1Test();
     //day6.part1();
     //day6.part2Test();
-    day6.part2();
+    //day6.part2();
+
+    Day7 day7;
+    day7.part1Test();
 }
