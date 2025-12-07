@@ -72,6 +72,42 @@ private:
         }
     }
 
+    static void countTimelines(Grid<string>& diagram, map<Point, long long>& splits, Point point) {
+        string value = diagram[point];
+        if (value == "^") {
+            splits[point] = 0;
+
+            int prevRow = point.first - 1;
+            while (prevRow >= 0) {
+                string prev = diagram[{prevRow, point.second}];
+                if (prev == "^") {
+                    break;
+                }
+                if (prev == "S") {
+                    splits[point] = 1;
+                    break;
+                }
+
+                vector<string> row = diagram[prevRow];
+                int leftCol = point.second - 1;
+                if (leftCol >= 0) {
+                    if (row[leftCol] == "^") {
+                        splits[point] += splits[{prevRow, leftCol}];
+                    }
+                }
+
+                int rightCol = point.second + 1;
+                if (rightCol < row.size()) {
+                    if (row[rightCol] == "^") {
+                        splits[point] += splits[{prevRow, rightCol}];
+                    }
+                }
+
+                prevRow--;
+            }
+        }
+    }
+
 public:
     Day7* part1Test() {
         stringstream ss(TEST_INPUT);
@@ -121,48 +157,43 @@ public:
         );
         diagram.print(false);
 
-        map<Point, long long> splitters;
+        map<Point, long long> splits;
 
-        diagram.navigate([&diagram, &splitters](Point point) {
-            string value = diagram[point];
-            if (value == "^") {
-                splitters[point] = 0;
-
-                int prevRow = point.first - 1;
-                while (prevRow >= 0) {
-                    string prev = diagram[{prevRow, point.second}];
-                    if (prev == "^") {
-                        break;
-                    }
-                    if (prev == "S") {
-                        break;
-                    }
-
-                    vector<string> row = diagram[prevRow];
-                    int leftCol = point.second - 1;
-                    if (leftCol >= 0) {
-                        if (row[leftCol] == "^") {
-                            splitters[{prevRow, leftCol}]++;
-                        }
-                    }
-
-                    int rightCol = point.second + 1;
-                    if (rightCol < row.size()) {
-                        if (row[rightCol] == "^") {
-                            splitters[{prevRow, rightCol}]++;
-                        }
-                    }
-
-                    prevRow--;
-                }
-            }
+        diagram.navigate([&diagram, &splits](Point point) {
+            Day7::countTimelines(diagram, splits, point);
         });
 
         long long sum = 0;
-        for (auto p : splitters) {
+        for (auto p : splits) {
             sum += p.second;
         }
         cout << "My yellow stream has splits " << sum << endl;
+
+        return this;
+    }
+
+    Day7* part2() {
+        FileReader reader("inputs/day7.txt");
+        stringstream stream = reader.toStringStream();
+        Grid diagram = Grid<string>::toGrid(
+            stream,
+            '\n',
+            [](char& v) { return string({ v }); }
+        );
+        diagram.print(false);
+
+        map<Point, long long> splits;
+
+        diagram.navigate([&diagram, &splits](Point point) {
+            Day7::countTimelines(diagram, splits, point);
+        });
+
+        long long sum = 0;
+        for (auto p : splits) {
+            sum += p.second;
+        }
+        // plus 1 for good measure
+        cout << "My yellow stream has splits " << sum + 1 << endl;
 
         return this;
     }
