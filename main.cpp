@@ -32,5 +32,6 @@ int main(int, char**){
     //day6.part2();
 
     Day7 day7;
-    day7.part1Test();
+    //day7.part1Test();
+    day7.part1();
 }
