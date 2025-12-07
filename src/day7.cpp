@@ -1,13 +1,14 @@
 #include "utils/filereader.cpp"
 #include "utils/gridify.cpp"
 #include "utils/printer.cpp"
+#include "utils/grid.cpp"
 #include <vector>
 #include <string>
 #include <functional>
+#include <map>
+#include <numeric>
 
 using namespace std;
-
-typedef vector<vector<string>> grid;
 
 class Day7 {
 private:
@@ -29,22 +30,14 @@ private:
         ".^.^.^.^.^...^.\n"
         "...............";
 
-    void navGrid(grid& g, function<void(int, int)> onStep) {
-        for (int row = 0; row < g.size(); row++) {
-            for (int col = 0; col < g[row].size(); col++) {
-                onStep(row, col);
-            }
-        }
-    }
-
-    static void countSplits(grid& diagram, long long& noSplit, int rowIdx, int colIdx) {
-        string step = diagram[rowIdx][colIdx];
+    static void countSplits(Grid<string>& diagram, long long& noSplit, Point point) {
+        string step = diagram[point];
         if (step == "^") {
             bool hasSplit = false;
 
-            int prevRow = rowIdx - 1;
+            int prevRow = point.first - 1;
             while (prevRow >= 0) {
-                string prev = diagram[prevRow][colIdx];
+                string prev = diagram[{prevRow, point.second}];
                 if (prev == "^") {
                     break;
                 }
@@ -54,16 +47,16 @@ private:
                 }
 
                 vector<string> row = diagram[prevRow];
-                if (colIdx - 1 >= 0) {
-                    string leftCol = row[colIdx - 1];
+                if (point.second - 1 >= 0) {
+                    string leftCol = row[point.second - 1];
                     if (leftCol == "^") {
                         hasSplit = true;
                         break;
                     }
                 }
 
-                if (colIdx + 1 < row.size()) {
-                    string rightCol = row[colIdx + 1];
+                if (point.second + 1 < row.size()) {
+                    string rightCol = row[point.second + 1];
                     if (rightCol == "^") {
                         hasSplit = true;
                         break;
@@ -82,37 +75,94 @@ private:
 public:
     Day7* part1Test() {
         stringstream ss(TEST_INPUT);
-        grid diagram = Gridify::createGridFromString<string>(
+        Grid diagram = Grid<string>::toGrid(
             ss,
             '\n',
             [](char& v) { return string({ v }); }
         );
-        Printer::print2DVector(diagram, false);
+        diagram.print();
 
         long long noSplit = 0;
-        navGrid(diagram, [&diagram, &noSplit](int rowIdx, int colIdx) {
-            Day7::countSplits(diagram, noSplit, rowIdx, colIdx);    
+
+        diagram.navigate([&diagram, &noSplit](Point point) {
+            Day7::countSplits(diagram, noSplit, point);
+        }
+        );
+        cout << "My yellow stream has splits " << noSplit << endl;
+
+        return this;
+    }
+
+    Day7* part1() {
+        FileReader reader("inputs/day7.txt");
+        stringstream stream = reader.toStringStream();
+        Grid diagram = Grid<string>::toGrid(
+            stream,
+            '\n',
+            [](char& v) { return string({ v }); }
+        );
+        diagram.print();
+
+        long long noSplit = 0;
+        diagram.navigate([&diagram, &noSplit](Point point) {
+            Day7::countSplits(diagram, noSplit, point);
         });
         cout << "My yellow stream has splits " << noSplit << endl;
 
         return this;
     }
-    // 1696 -- too high
-    Day7* part1() {
-        FileReader reader("inputs/day7.txt");
-        stringstream stream = reader.toStringStream();
-        grid diagram = Gridify::createGridFromString<string>(
-            stream,
+
+    Day7* part2Test() {
+        stringstream ss(TEST_INPUT);
+        Grid diagram = Grid<string>::toGrid(
+            ss,
             '\n',
             [](char& v) { return string({ v }); }
         );
-        Printer::print2DVector(diagram, false);
+        diagram.print(false);
 
-        long long noSplit = 0;
-        navGrid(diagram, [&diagram, &noSplit](int rowIdx, int colIdx) {
-            Day7::countSplits(diagram, noSplit, rowIdx, colIdx);    
+        map<Point, long long> splitters;
+
+        diagram.navigate([&diagram, &splitters](Point point) {
+            string value = diagram[point];
+            if (value == "^") {
+                splitters[point] = 0;
+
+                int prevRow = point.first - 1;
+                while (prevRow >= 0) {
+                    string prev = diagram[{prevRow, point.second}];
+                    if (prev == "^") {
+                        break;
+                    }
+                    if (prev == "S") {
+                        break;
+                    }
+
+                    vector<string> row = diagram[prevRow];
+                    int leftCol = point.second - 1;
+                    if (leftCol >= 0) {
+                        if (row[leftCol] == "^") {
+                            splitters[{prevRow, leftCol}]++;
+                        }
+                    }
+
+                    int rightCol = point.second + 1;
+                    if (rightCol < row.size()) {
+                        if (row[rightCol] == "^") {
+                            splitters[{prevRow, rightCol}]++;
+                        }
+                    }
+
+                    prevRow--;
+                }
+            }
         });
-        cout << "My yellow stream has splits " << noSplit << endl;
+
+        long long sum = 0;
+        for (auto p : splitters) {
+            sum += p.second;
+        }
+        cout << "My yellow stream has splits " << sum << endl;
 
         return this;
     }

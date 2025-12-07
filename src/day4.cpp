@@ -1,15 +1,10 @@
 #include "utils/filereader.cpp"
+#include "utils/position.cpp"
 #include <vector>
 #include <sstream>
 #include <format>
 
 typedef vector<vector<char>> charboard;
-
-struct Position
-{
-    int row;
-    int col;
-};
 
 class Day4
 {
