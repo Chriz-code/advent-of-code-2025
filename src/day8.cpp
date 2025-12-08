@@ -7,15 +7,15 @@
 #include"utils/stringutils.cpp"
 #include "utils/filereader.cpp"
 #include<set>
-#include<unordered_set>
 
 
 struct Point3D {
     int x, y, z;
-    bool operator == (const Point3D& other) {
+    
+    bool operator == (const Point3D& other) const {
         return x == other.x && y == other.y && z == other.z;
     }
-
+   
     bool operator < (const Point3D& other) const {
         return std::tie(x, y, z) < std::tie(other.x, other.y, other.z);
     }
@@ -26,12 +26,16 @@ struct Line3D {
     Point3D point2;
     long dist;
 
-    bool operator == (const Line3D& other) {
-        return (point1 == other.point1 && point2 == other.point2)
-            || (point2 == other.point1 && point1 == other.point2);
+    bool operator == (const Line3D& other) const {
+        return std::set({point1, point2}) == std::set({other.point1, other.point2});
     }
+    
     bool operator < (const Line3D& other) const {
-        return dist < other.dist;
+        return std::set({point1, point2}) < std::set({other.point1, other.point2});
+    }
+
+    static bool orderByDist(const Line3D& a, const Line3D& b) {
+        return a.dist < b.dist;
     }
 };
 
@@ -101,7 +105,6 @@ private:
                 }
                 Line3D line = Line3D({ point1, point2, 0 });
                 if (distances.find(line) != distances.end()) {
-                    cout << "dupe" << endl;
                     continue;
                 }
                 line.dist = distance(line);
@@ -114,40 +117,52 @@ private:
     }
 
     std::vector<Circut> createCircuts(std::vector<Line3D>& distances, int noConnections = 10) {
-        std::sort(distances.begin(), distances.end(), [](Line3D const& lhs, Line3D const& rhs) {
-            return lhs.dist < rhs.dist;
-        });
+        std::sort(distances.begin(), distances.end(), Line3D::orderByDist);
 
         // create circuts, connect the 10 shortest
         std::vector<Circut> circuts;
         for (int i = 0; i < noConnections; ++i) {
             Line3D line = distances[i];
 
-            bool hasPoint1 = false;
-            bool hasPoint2 = false;
-            auto hasEitherJunction = std::find_if(
+            auto hasPoint1 = std::find_if(
                 circuts.begin(),
                 circuts.end(),
-                [&line, &hasPoint1, &hasPoint2](auto& circut) {
-                hasPoint1 = std::find(circut.begin(), circut.end(), line.point1) != circut.end();
-                hasPoint2 = std::find(circut.begin(), circut.end(), line.point2) != circut.end();
-                return hasPoint1 || hasPoint2;
+                [&line](auto& circut) {
+                return std::find(circut.begin(), circut.end(), line.point1) != circut.end();;
             });
-            int circutIdx = hasEitherJunction - circuts.begin();
-            if (hasEitherJunction == circuts.end()) {
+            auto hasPoint2 = std::find_if(
+                circuts.begin(),
+                circuts.end(),
+                [&line](auto& circut) {
+                return std::find(circut.begin(), circut.end(), line.point2) != circut.end();
+            });
+
+            // Has neither
+            if (hasPoint1 == circuts.end() && hasPoint2 == circuts.end()) {
                 circuts.push_back(Circut({ line.point1, line.point2 }));
-                cout << ".";
                 continue;
             }
-            if (hasPoint1) {
-                circuts[circutIdx].push_back(line.point2);
-                cout << ".";
+            // Has point 1, but not point 2
+            int idx1 = hasPoint1 - circuts.begin();
+            if (hasPoint2 == circuts.end()) {
+                circuts[idx1].push_back(line.point2);
                 continue;
             }
-            if (hasPoint2) {
-                circuts[circutIdx].push_back(line.point1);
-                cout << ".";
+            // Has point 2, but not point 1
+            int idx2 = hasPoint2 - circuts.begin();
+            if (hasPoint1 == circuts.end()) {
+                circuts[idx2].push_back(line.point1);
                 continue;
+            }
+            // point 1 and point 2 same circut 
+            if (idx1 == idx2) {
+                //Maybe add again idk???
+                continue;
+            }
+            // point 1 and point 2 diffirent circut 
+            if (idx1 != idx2) {
+                hasPoint1->insert(hasPoint1->end(), hasPoint2->begin(), hasPoint2->end());
+                circuts.erase(hasPoint2);
             }
         }
 
@@ -156,7 +171,7 @@ private:
     }
 
     long long resultValue(std::vector<Circut>& circuts, int length = 3) {
-        std:set<long> circutSizes;
+    std:set<long> circutSizes;
         for (auto& circut : circuts) {
             circutSizes.insert(circut.size());
         }
@@ -188,6 +203,7 @@ public:
     // 18699743462400000 -- too high :(
     // 24 -- not right :(
     // 14300 -- too low
+    // 42315
     Day8* part1() {
         FileReader reader("inputs/day8.txt");
         stringstream stream = reader.toStringStream();
@@ -201,6 +217,20 @@ public:
 
         cout << "Thats a lot of Mario Kart: " << sum << endl;
 
+        return this;
+    }
+
+    Day8* part2Test() {
+        std::stringstream stream(TEST_INPUT);
+        std::vector<Point3D> points = parseToPoints(stream);
+        cout << "Points parsed: " << points.size() << endl;
+        std::vector<Line3D> distances = calculateDistances(points);
+        cout << "Distances calculated: " << distances.size() << endl;
+        std::vector<Circut> circuts = createCircuts(distances, distances.size());
+
+        long long sum = resultValue(circuts);
+
+        cout << "Thats a lot of Mario Kart: " << sum << endl;
         return this;
     }
 };
