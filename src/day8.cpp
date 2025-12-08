@@ -6,6 +6,7 @@
 #include<algorithm>
 #include"utils/stringutils.cpp"
 #include "utils/filereader.cpp"
+#include<set>
 
 
 struct Point3D {
@@ -90,14 +91,14 @@ private:
         return distances;
     }
 
-    std::vector<Circut> createCircuts(std::vector<Line3D>& distances, int noCircuts = 10) {
+    std::vector<Circut> createCircuts(std::vector<Line3D>& distances, int noConnections = 10) {
         std::sort(distances.begin(), distances.end(), [](Line3D const& lhs, Line3D const& rhs) {
             return lhs.dist < rhs.dist;
         });
 
         // create circuts, connect the 10 shortest
         std::vector<Circut> circuts;
-        for (int i = 0; i < noCircuts; i++) {
+        for (int i = 0; i < noConnections; ++i) {
             Line3D line = distances[i];
 
             bool hasPoint1 = false;
@@ -147,11 +148,15 @@ public:
         cout << "Distances calculated: " << distances.size() << endl;
         std::vector<Circut> circuts = createCircuts(distances);
 
-        long sum = 1;
+        std:set<long> circutSizes;
         for (auto& circut : circuts) {
-            cout << circut.size() << endl;
-            sum *= circut.size();
+            circutSizes.insert(circut.size());
         }
+        long sum = 1;
+        for (auto size : circutSizes) {
+            sum *= size;
+        }
+
         cout << "Thats a lot of Mario Kart: " << sum << endl;
         return this;
     }
