@@ -3,10 +3,20 @@
 #include<string>
 #include<map>
 #include<math.h>
+#include<algorithm>
 #include"utils/stringutils.cpp"
 
 struct Point3D {
     int x, y, z;
+    bool operator == (Point3D const& other) {
+        return x == other.x && y == other.y && z == other.z;
+    }
+};
+
+struct Line3D {
+    Point3D point1;
+    Point3D point2;
+    long dist;
 };
 
 class Day8 {
@@ -62,13 +72,36 @@ public:
     Day8* part1Test() {
         std::stringstream ss(TEST_INPUT);
         std::vector<Point3D> points = parseToPoints(ss);
-        std::map<Point3D, std::map<Point3D, long>> distances;
+        std::vector<Line3D> distances;
 
-        cout << "distance between "
-            << toString(points[0]) << " and "
-            << toString(points[1]) << " is "
-            << std::to_string(distance(points[0], points[1]))
-            << endl;
+        for (Point3D point1 : points) {
+            for (Point3D point2 : points) {
+                if (point1 == point2) {
+                    continue;
+                }
+                if (std::find_if(distances.begin(), distances.end(), [&point1, &point2](auto& line) {
+                    return line.point1 == point2 && line.point2 == point1;
+                }) != distances.end()) {
+                    continue;
+                }
+                long dist = distance(point1, point2);
+                distances.push_back({ point1, point2, dist });
+            }
+        }
+
+        std::sort(distances.begin(), distances.end(), [](Line3D const& lhs, Line3D const& rhs) {
+            return lhs.dist < rhs.dist;
+        });
+
+        for (auto& l : distances) {
+            cout << "distance between "
+                << toString(l.point1) << " and "
+                << toString(l.point2) << " is "
+                << std::to_string(l.dist)
+                << endl;
+        }
+
+        // create circut
 
         return this;
     }
