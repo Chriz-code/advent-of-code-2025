@@ -6,6 +6,7 @@
 #include<algorithm>
 #include"utils/stringutils.cpp"
 
+
 struct Point3D {
     int x, y, z;
     bool operator == (Point3D const& other) {
@@ -18,6 +19,8 @@ struct Line3D {
     Point3D point2;
     long dist;
 };
+
+typedef std::vector<Point3D> Circut;
 
 class Day8 {
 private:
@@ -68,12 +71,8 @@ private:
         return "(" + std::to_string(p.x) + ", " + std::to_string(p.y) + ", " + std::to_string(p.z) + ")";
     }
 
-public:
-    Day8* part1Test() {
-        std::stringstream ss(TEST_INPUT);
-        std::vector<Point3D> points = parseToPoints(ss);
+    std::vector<Line3D> calculateDistances(std::vector<Point3D>& points) {
         std::vector<Line3D> distances;
-
         for (Point3D point1 : points) {
             for (Point3D point2 : points) {
                 if (point1 == point2) {
@@ -88,21 +87,62 @@ public:
                 distances.push_back({ point1, point2, dist });
             }
         }
+        return distances;
+    }
 
+    std::vector<Circut> createCircuts(std::vector<Line3D>& distances, int noCircuts = 10) {
         std::sort(distances.begin(), distances.end(), [](Line3D const& lhs, Line3D const& rhs) {
             return lhs.dist < rhs.dist;
         });
 
-        for (auto& l : distances) {
-            cout << "distance between "
-                << toString(l.point1) << " and "
-                << toString(l.point2) << " is "
-                << std::to_string(l.dist)
-                << endl;
+        // create circuts, connect the 10 shortest
+        std::vector<Circut> circuts;
+        for (int i = 0; i < noCircuts; i++) {
+            Line3D line = distances[i];
+
+            bool hasPoint1 = false;
+            bool hasPoint2 = false;
+            auto hasEitherJunction = std::find_if(
+                circuts.begin(),
+                circuts.end(),
+                [&line, &hasPoint1, &hasPoint2](auto& circut) {
+                hasPoint1 = std::find(circut.begin(), circut.end(), line.point1) != circut.end();
+                hasPoint2 = std::find(circut.begin(), circut.end(), line.point2) != circut.end();
+                return hasPoint1 || hasPoint2;
+            });
+            int circutIdx = hasEitherJunction - circuts.begin();
+            if (hasEitherJunction == circuts.end()) {
+                circuts.push_back(Circut({ line.point1, line.point2 }));
+                continue;
+            }
+            if (hasPoint1) {
+                circuts[circutIdx].push_back(line.point2);
+                continue;
+            }
+            if (hasPoint2) {
+                circuts[circutIdx].push_back(line.point1);
+                continue;
+            }
         }
 
-        // create circut
+        return circuts;
+    }
 
+public:
+    Day8* part1Test() {
+        std::stringstream ss(TEST_INPUT);
+        std::vector<Point3D> points = parseToPoints(ss);
+        std::vector<Line3D> distances = calculateDistances(points);
+        std::vector<Circut> circuts = createCircuts(distances);
+
+        for (auto& circut : circuts) {
+            cout << circut.size() << endl;
+        }
+
+        return this;
+    }
+
+    Day8* part1() {
         return this;
     }
 };
