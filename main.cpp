@@ -40,4 +40,5 @@ int main(int, char**){
 
     Day8 day8;
     day8.part1Test();
+    //day8.part1();
 }

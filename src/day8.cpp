@@ -5,6 +5,7 @@
 #include<math.h>
 #include<algorithm>
 #include"utils/stringutils.cpp"
+#include "utils/filereader.cpp"
 
 
 struct Point3D {
@@ -57,9 +58,6 @@ private:
                 std::stoi(points[2])
                 });
         }
-        for (auto& point : result) {
-            cout << toString(point) << endl;
-        }
         return result;
     }
 
@@ -86,7 +84,9 @@ private:
                 long dist = distance(point1, point2);
                 distances.push_back({ point1, point2, dist });
             }
+            cout << ".";
         }
+        cout << endl;
         return distances;
     }
 
@@ -113,36 +113,66 @@ private:
             int circutIdx = hasEitherJunction - circuts.begin();
             if (hasEitherJunction == circuts.end()) {
                 circuts.push_back(Circut({ line.point1, line.point2 }));
+                cout << ".";
+                continue;
+            }
+            if (hasPoint1 && hasPoint2) {
+                //Redundancy?
+                circuts[circutIdx].push_back({1,1});
+                cout << ".";
                 continue;
             }
             if (hasPoint1) {
                 circuts[circutIdx].push_back(line.point2);
+                cout << ".";
                 continue;
             }
             if (hasPoint2) {
                 circuts[circutIdx].push_back(line.point1);
+                cout << ".";
                 continue;
             }
         }
 
+        cout << endl;
         return circuts;
     }
 
 public:
     Day8* part1Test() {
-        std::stringstream ss(TEST_INPUT);
-        std::vector<Point3D> points = parseToPoints(ss);
+        std::stringstream stream(TEST_INPUT);
+        std::vector<Point3D> points = parseToPoints(stream);
+        cout << "Points parsed: " << points.size() << endl;
         std::vector<Line3D> distances = calculateDistances(points);
+        cout << "Distances calculated: " << distances.size() << endl;
         std::vector<Circut> circuts = createCircuts(distances);
 
+        long sum = 1;
         for (auto& circut : circuts) {
             cout << circut.size() << endl;
+            sum *= circut.size();
         }
-
+        cout << "Thats a lot of Mario Kart: " << sum << endl;
         return this;
     }
 
     Day8* part1() {
+        FileReader reader("inputs/day8.txt");
+        stringstream stream = reader.toStringStream();
+        std::vector<Point3D> points = parseToPoints(stream);
+        cout << "Points parsed: " << points.size() << endl;
+        std::vector<Line3D> distances = calculateDistances(points);
+        cout << "Distances calculated: " << distances.size() << endl;
+        std::vector<Circut> circuts = createCircuts(distances, 1000);
+
+        long sum = 1;
+        cout << "TEST";
+        for (auto& circut : circuts) {
+            cout << circut.size() << endl;
+            sum *= circut.size();
+        }
+        cout << "Thats a lot of Mario Kart: " << sum << endl;
+
         return this;
     }
 };
