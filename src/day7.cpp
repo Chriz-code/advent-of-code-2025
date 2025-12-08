@@ -111,7 +111,7 @@ private:
 public:
     Day7* part1Test() {
         stringstream ss(TEST_INPUT);
-        Grid diagram = Grid<string>::toGrid(
+        Grid<string> diagram = Grid<string>::toGrid(
             ss,
             '\n',
             [](char& v) { return string({ v }); }
@@ -132,7 +132,7 @@ public:
     Day7* part1() {
         FileReader reader("inputs/day7.txt");
         stringstream stream = reader.toStringStream();
-        Grid diagram = Grid<string>::toGrid(
+        Grid<string> diagram = Grid<string>::toGrid(
             stream,
             '\n',
             [](char& v) { return string({ v }); }
@@ -150,7 +150,7 @@ public:
 
     Day7* part2Test() {
         stringstream ss(TEST_INPUT);
-        Grid diagram = Grid<string>::toGrid(
+        Grid<string> diagram = Grid<string>::toGrid(
             ss,
             '\n',
             [](char& v) { return string({ v }); }
@@ -175,7 +175,7 @@ public:
     Day7* part2() {
         FileReader reader("inputs/day7.txt");
         stringstream stream = reader.toStringStream();
-        Grid diagram = Grid<string>::toGrid(
+        Grid<string> diagram = Grid<string>::toGrid(
             stream,
             '\n',
             [](char& v) { return string({ v }); }

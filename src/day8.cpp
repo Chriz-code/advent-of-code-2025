@@ -1,3 +1,14 @@
+#include<sstream>
+#include<vector>
+#include<string>
+#include<map>
+#include<math.h>
+#include"utils/stringutils.cpp"
+
+struct Point3D {
+    int x, y, z;
+};
+
 class Day8 {
 private:
     const char* TEST_INPUT =
@@ -21,8 +32,44 @@ private:
         "862,61,35\n"
         "984,92,344\n"
         "425,690,689";
+
+    std::vector<Point3D> parseToPoints(std::stringstream& ss) {
+        std::vector<Point3D> result;
+        std::string line;
+        while (getline(ss, line)) {
+            std::vector<std::string> points = StringUtils::split(line, ',');
+            result.push_back({
+                std::stoi(points[0]),
+                std::stoi(points[1]),
+                std::stoi(points[2])
+                });
+        }
+        for (auto& point : result) {
+            cout << toString(point) << endl;
+        }
+        return result;
+    }
+
+    long distance(Point3D a, Point3D b) {
+        return sqrtl(pow(a.x - b.x, 2) + pow(a.y - b.y, 2) + pow(a.z - b.z, 2));
+    }
+
+    std::string toString(Point3D p) {
+        return "(" + std::to_string(p.x) + ", " + std::to_string(p.y) + ", " + std::to_string(p.z) + ")";
+    }
+
 public:
     Day8* part1Test() {
+        std::stringstream ss(TEST_INPUT);
+        std::vector<Point3D> points = parseToPoints(ss);
+        std::map<Point3D, std::map<Point3D, long>> distances;
 
+        cout << "distance between "
+            << toString(points[0]) << " and "
+            << toString(points[1]) << " is "
+            << std::to_string(distance(points[0], points[1]))
+            << endl;
+
+        return this;
     }
 };

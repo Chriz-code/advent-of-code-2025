@@ -6,7 +6,7 @@
 
 typedef std::pair<int, int> Point;
 
-template <class T>
+template <typename T>
 class Grid {
 private:
     std::vector<std::vector<T>> grid;
@@ -14,8 +14,9 @@ private:
     Grid(std::vector<std::vector<T>> grid) {
         this->grid = grid;
     }
+
 public:
-    static Grid<T> toGrid(
+    static Grid toGrid(
         std::stringstream& ss,
         char delim,
         std::function<T(char&)> converter
@@ -65,6 +66,5 @@ public:
             cout << "]" << endl;
         }
     }
-
 };
 #endif
