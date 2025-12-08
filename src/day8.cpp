@@ -11,8 +11,12 @@
 
 struct Point3D {
     int x, y, z;
-    bool operator == (Point3D const& other) {
+    bool operator == (const Point3D& other) {
         return x == other.x && y == other.y && z == other.z;
+    }
+
+    bool operator < (const Point3D& xyz) const {
+        return std::tie(x, y, z) < std::tie(xyz.x, xyz.y, xyz.z);
     }
 };
 
@@ -23,6 +27,7 @@ struct Line3D {
 };
 
 typedef std::vector<Point3D> Circut;
+typedef std::map<Point3D, std::map<Point3D, long>> PointDistances;
 
 class Day8 {
 private:
@@ -70,25 +75,38 @@ private:
         return "(" + std::to_string(p.x) + ", " + std::to_string(p.y) + ", " + std::to_string(p.z) + ")";
     }
 
+    bool hasKey(PointDistances& distances, const Point3D& a, const Point3D& b) {
+        return distances.find(a) != distances.end() && distances[a].find(b) != distances[a].end();
+    }
+
     std::vector<Line3D> calculateDistances(std::vector<Point3D>& points) {
-        std::vector<Line3D> distances;
+        PointDistances distances;
         for (Point3D point1 : points) {
             for (Point3D point2 : points) {
                 if (point1 == point2) {
                     continue;
                 }
-                if (std::find_if(distances.begin(), distances.end(), [&point1, &point2](auto& line) {
-                    return line.point1 == point2 && line.point2 == point1;
-                }) != distances.end()) {
+                if (hasKey(distances, point2, point1)) {
                     continue;
                 }
+
                 long dist = distance(point1, point2);
-                distances.push_back({ point1, point2, dist });
+                distances[point1][point2] = dist;
             }
             cout << ".";
         }
-        cout << endl;
-        return distances;
+        cout << endl << "transforming" << endl;;
+        std::vector<Line3D> result;
+        for (auto& point1 : distances) {
+            for (auto& point2 : point1.second) {
+                result.push_back({
+                    point1.first,
+                    point2.first,
+                    point2.second
+                    });
+            }
+        }
+        return result;
     }
 
     std::vector<Circut> createCircuts(std::vector<Line3D>& distances, int noConnections = 10) {
@@ -119,7 +137,7 @@ private:
             }
             if (hasPoint1 && hasPoint2) {
                 //Redundancy?
-                circuts[circutIdx].push_back({1,1});
+                circuts[circutIdx].push_back({ 1,1 });
                 cout << ".";
                 continue;
             }
@@ -139,6 +157,22 @@ private:
         return circuts;
     }
 
+    long long resultValue(std::vector<Circut>& circuts, int length = 3) {
+    std:set<long> circutSizes;
+        for (auto& circut : circuts) {
+            circutSizes.insert(circut.size());
+        }
+        std::vector<long> orderedCircutSizes(circutSizes.begin(), circutSizes.end());
+        std::sort(orderedCircutSizes.begin(), orderedCircutSizes.end(), greater<long>());
+
+        long long sum = 1;
+        for (int i = 0; i < length; i++) {
+            sum *= orderedCircutSizes[i];
+        }
+
+        return sum;
+    }
+
 public:
     Day8* part1Test() {
         std::stringstream stream(TEST_INPUT);
@@ -148,19 +182,14 @@ public:
         cout << "Distances calculated: " << distances.size() << endl;
         std::vector<Circut> circuts = createCircuts(distances);
 
-        std:set<long> circutSizes;
-        for (auto& circut : circuts) {
-            circutSizes.insert(circut.size());
-        }
-        long sum = 1;
-        for (auto size : circutSizes) {
-            sum *= size;
-        }
+        long long sum = resultValue(circuts);
 
         cout << "Thats a lot of Mario Kart: " << sum << endl;
         return this;
     }
-
+    // 18699743462400000 -- too high :(
+    // 24 -- not right :(
+    // 14300 -- too low
     Day8* part1() {
         FileReader reader("inputs/day8.txt");
         stringstream stream = reader.toStringStream();
@@ -170,12 +199,8 @@ public:
         cout << "Distances calculated: " << distances.size() << endl;
         std::vector<Circut> circuts = createCircuts(distances, 1000);
 
-        long sum = 1;
-        cout << "TEST";
-        for (auto& circut : circuts) {
-            cout << circut.size() << endl;
-            sum *= circut.size();
-        }
+        long long sum = resultValue(circuts);
+
         cout << "Thats a lot of Mario Kart: " << sum << endl;
 
         return this;
