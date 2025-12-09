@@ -72,7 +72,7 @@ private:
         }
     }
 
-    static void countTimelines(Grid<string>& diagram, map<Point, long long>& splits, Point point) {
+    static void countTimelines(Grid<string>& diagram, map<Point2D, long long>& splits, Point point) {
         string value = diagram[point];
         if (value == "^") {
             splits[point] = 0;
@@ -120,7 +120,7 @@ public:
 
         long long noSplit = 0;
 
-        diagram.navigate([&diagram, &noSplit](Point point) {
+        diagram.navigateLTR([&diagram, &noSplit](Point2D point) {
             Day7::countSplits(diagram, noSplit, point);
         }
         );
@@ -140,7 +140,7 @@ public:
         diagram.print();
 
         long long noSplit = 0;
-        diagram.navigate([&diagram, &noSplit](Point point) {
+        diagram.navigateLTR([&diagram, &noSplit](Point2D point) {
             Day7::countSplits(diagram, noSplit, point);
         });
         cout << "My yellow stream has splits " << noSplit << endl;
@@ -157,9 +157,9 @@ public:
         );
         diagram.print(false);
 
-        map<Point, long long> splits;
+        map<Point2D, long long> splits;
 
-        diagram.navigate([&diagram, &splits](Point point) {
+        diagram.navigateLTR([&diagram, &splits](Point2D point) {
             Day7::countTimelines(diagram, splits, point);
         });
 
@@ -182,9 +182,9 @@ public:
         );
         diagram.print(false);
 
-        map<Point, long long> splits;
+        map<Point2D, long long> splits;
 
-        diagram.navigate([&diagram, &splits](Point point) {
+        diagram.navigateLTR([&diagram, &splits](Point2D point) {
             Day7::countTimelines(diagram, splits, point);
         });
 

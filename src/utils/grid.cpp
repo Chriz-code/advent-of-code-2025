@@ -4,7 +4,7 @@
 #include <vector>
 #include <sstream>
 
-typedef std::pair<int, int> Point;
+typedef std::pair<int, int> Point2D;
 
 template <typename T>
 class Grid {
@@ -37,11 +37,11 @@ public:
         return grid[row];
     }
 
-    T& operator [] (Point p) {
+    T& operator [] (Point2D p) {
         return grid[p.first][p.second];
     }
 
-    void navigate(function<void(Point)> onStep) {
+    void navigateLTR(function<void(Point2D)> onStep) {
         for (int row = 0; row < grid.size(); row++) {
             for (int col = 0; col < grid[row].size(); col++) {
                 onStep({ row, col });

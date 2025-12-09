@@ -3,15 +3,10 @@
 #include <sstream>
 #include <vector>
 #include <cmath>
+#include "utils/grid.cpp"
 
 typedef long long llong;
 
-struct Point2D {
-    llong x, y;
-    long double dist;
-};
-
-typedef std::vector<Point2D> Coordinates;
 
 class Day9 {
 private:
@@ -25,32 +20,15 @@ private:
         "2,3\n"
         "7,3";
 
-    Coordinates getCoords(std::stringstream& stream) {
-        Coordinates coords;
-
-        std::string line;
-        while (getline(stream, line)) {
-            std::vector<std::string> digits = StringUtils::split(line, ',');
-            llong x = stoll(digits[0]);
-            llong y = stoll(digits[1]);
-            coords.push_back({ x, y, sqrt(pow(x, 2) + pow(y, 2))});
-        }
-
-        return coords;
-    }
-
-
     long long calcArea(Point2D& topLeft, Point2D& bottomRight) {
-        llong w = abs(bottomRight.x - topLeft.x) + 1;
-        llong l = abs(bottomRight.y - topLeft.y) + 1;
+        llong w = abs(bottomRight.first - topLeft.first) + 1;
+        llong l = abs(bottomRight.second - topLeft.second) + 1;
         return w * l;
     }
 
 public:
     Day9* part1Test() {
         std::stringstream stream(TEST_INPUT);
-
-        Coordinates coords = getCoords(stream);
 
         return this;
     }
