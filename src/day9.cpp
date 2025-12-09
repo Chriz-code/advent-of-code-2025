@@ -39,15 +39,6 @@ private:
         return coords;
     }
 
-    Coordinates findLargestArea(Coordinates& coords) {
-        //Sort top left
-        std::sort(coords.begin(), coords.end(), [](const auto& coord1, const auto& coord2) {
-            return coord1.dist < coord2.dist;
-        });
-        Point2D topLeft = *coords.begin();
-        Point2D bottomRight = coords.back();
-        return Coordinates({ topLeft, bottomRight });
-    }
 
     long long calcArea(Point2D& topLeft, Point2D& bottomRight) {
         llong w = abs(bottomRight.x - topLeft.x) + 1;
@@ -60,39 +51,6 @@ public:
         std::stringstream stream(TEST_INPUT);
 
         Coordinates coords = getCoords(stream);
-        Coordinates areaCoords = findLargestArea(coords);
-
-        Point2D topLeft = areaCoords[0];
-        Point2D bottomRight = areaCoords[1];
-        llong area = calcArea(topLeft, bottomRight);
-
-        cout << "The 2 points are: "
-            << "(" << topLeft.x << "," << topLeft.y << ")"
-            << "(" << bottomRight.x << "," << bottomRight.y << ")" << endl;
-        cout << "The largest area is: " << area << endl;
-
-        return this;
-    }
-
-    // 3469520181 - too low?
-    // 166048784
-    // 4737634748 - too low??
-    // 4737634748
-    Day9* part1() {
-        FileReader reader("inputs/day9.txt");
-        std::stringstream stream = reader.toStringStream();
-
-        Coordinates coords = getCoords(stream);
-        Coordinates areaCoords = findLargestArea(coords);
-
-        Point2D topLeft = areaCoords[0];
-        Point2D bottomRight = areaCoords[1];
-        llong area = calcArea(topLeft, bottomRight);
-
-        cout << "The 2 points are: "
-            << "(" << topLeft.x << "," << topLeft.y << ")"
-            << "(" << bottomRight.x << "," << bottomRight.y << ")" << endl;
-        cout << "The largest area is: " << area << endl;
 
         return this;
     }
