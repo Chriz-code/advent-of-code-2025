@@ -30,7 +30,7 @@ private:
         ".^.^.^.^.^...^.\n"
         "...............";
 
-    static void countSplits(Grid<string>& diagram, long long& noSplit, Point point) {
+    static void countSplits(Grid<string>& diagram, long long& noSplit, Point2D point) {
         string step = diagram[point];
         if (step == "^") {
             bool hasSplit = false;
@@ -72,7 +72,7 @@ private:
         }
     }
 
-    static void countTimelines(Grid<string>& diagram, map<Point2D, long long>& splits, Point point) {
+    static void countTimelines(Grid<string>& diagram, map<Point2D, long long>& splits, Point2D point) {
         string value = diagram[point];
         if (value == "^") {
             splits[point] = 0;
