@@ -6,18 +6,16 @@
 #include <string>
 #include <sstream>
 
-using namespace std;
-
 class FileReader
 {
 
 private:
     bool isValid;
 public:
-    ifstream* stream;
+    std::ifstream* stream;
 
-    FileReader(string filePath) {
-        stream = new ifstream(filePath);
+    FileReader(std::string filePath) {
+        stream = new std::ifstream(filePath);
         if (!(*stream).is_open())
         {
             cout << "Unable to open file" << endl;
@@ -28,10 +26,10 @@ public:
         }
     }
 
-    string toString()
+    std::string toString()
     {
-        string line;
-        string result;
+        std::string line;
+        std::string result;
         while (getline(*stream, line, '\n'))
         {
             result += line;
@@ -39,8 +37,8 @@ public:
         return result;
     }
 
-    stringstream toStringStream() {
-        stringstream buffer;
+    std::stringstream toStringStream() {
+        std::stringstream buffer;
         buffer << (*stream).rdbuf();
         return buffer;
     }
