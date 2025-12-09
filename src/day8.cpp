@@ -8,229 +8,230 @@
 #include "utils/filereader.cpp"
 #include<set>
 
+namespace Day8 {
+    struct Point3D {
+        int x, y, z;
 
-struct Point3D {
-    int x, y, z;
-    
-    bool operator == (const Point3D& other) const {
-        return x == other.x && y == other.y && z == other.z;
-    }
-   
-    bool operator < (const Point3D& other) const {
-        return std::tie(x, y, z) < std::tie(other.x, other.y, other.z);
-    }
-};
+        bool operator == (const Point3D& other) const {
+            return x == other.x && y == other.y && z == other.z;
+        }
 
-struct Line3D {
-    Point3D point1;
-    Point3D point2;
-    long dist;
+        bool operator < (const Point3D& other) const {
+            return std::tie(x, y, z) < std::tie(other.x, other.y, other.z);
+        }
+    };
 
-    bool operator == (const Line3D& other) const {
-        return std::set({point1, point2}) == std::set({other.point1, other.point2});
-    }
-    
-    bool operator < (const Line3D& other) const {
-        return std::set({point1, point2}) < std::set({other.point1, other.point2});
-    }
+    struct Line3D {
+        Point3D point1;
+        Point3D point2;
+        long dist;
 
-    static bool orderByDist(const Line3D& a, const Line3D& b) {
-        return a.dist < b.dist;
-    }
-};
+        bool operator == (const Line3D& other) const {
+            return std::set({ point1, point2 }) == std::set({ other.point1, other.point2 });
+        }
 
-typedef std::vector<Point3D> Circut;
-typedef std::map<Point3D, std::map<Point3D, long>> PointDistances;
+        bool operator < (const Line3D& other) const {
+            return std::set({ point1, point2 }) < std::set({ other.point1, other.point2 });
+        }
 
-class Day8 {
-private:
-    const char* TEST_INPUT =
-        "162,817,812\n"
-        "57,618,57\n"
-        "906,360,560\n"
-        "592,479,940\n"
-        "352,342,300\n"
-        "466,668,158\n"
-        "542,29,236\n"
-        "431,825,988\n"
-        "739,650,466\n"
-        "52,470,668\n"
-        "216,146,977\n"
-        "819,987,18\n"
-        "117,168,530\n"
-        "805,96,715\n"
-        "346,949,466\n"
-        "970,615,88\n"
-        "941,993,340\n"
-        "862,61,35\n"
-        "984,92,344\n"
-        "425,690,689";
+        static bool orderByDist(const Line3D& a, const Line3D& b) {
+            return a.dist < b.dist;
+        }
+    };
 
-    std::vector<Point3D> parseToPoints(std::stringstream& ss) {
-        std::vector<Point3D> result;
-        std::string line;
-        while (getline(ss, line)) {
-            std::vector<std::string> points = StringUtils::split(line, ',');
-            result.push_back({
-                std::stoi(points[0]),
-                std::stoi(points[1]),
-                std::stoi(points[2])
+    typedef std::vector<Point3D> Circut;
+    typedef std::map<Point3D, std::map<Point3D, long>> PointDistances;
+
+    class Solution {
+    private:
+        const char* TEST_INPUT =
+            "162,817,812\n"
+            "57,618,57\n"
+            "906,360,560\n"
+            "592,479,940\n"
+            "352,342,300\n"
+            "466,668,158\n"
+            "542,29,236\n"
+            "431,825,988\n"
+            "739,650,466\n"
+            "52,470,668\n"
+            "216,146,977\n"
+            "819,987,18\n"
+            "117,168,530\n"
+            "805,96,715\n"
+            "346,949,466\n"
+            "970,615,88\n"
+            "941,993,340\n"
+            "862,61,35\n"
+            "984,92,344\n"
+            "425,690,689";
+
+        std::vector<Point3D> parseToPoints(std::stringstream& ss) {
+            std::vector<Point3D> result;
+            std::string line;
+            while (getline(ss, line)) {
+                std::vector<std::string> points = Utils::StringUtils::split(line, ',');
+                result.push_back({
+                    std::stoi(points[0]),
+                    std::stoi(points[1]),
+                    std::stoi(points[2])
+                    });
+            }
+            return result;
+        }
+
+        long distance(Point3D& a, Point3D& b) {
+            return sqrtl(pow(a.x - b.x, 2) + pow(a.y - b.y, 2) + pow(a.z - b.z, 2));
+        }
+
+        long distance(Line3D& line) {
+            return distance(line.point1, line.point2);
+        }
+
+        std::string toString(Point3D p) {
+            return "(" + std::to_string(p.x) + ", " + std::to_string(p.y) + ", " + std::to_string(p.z) + ")";
+        }
+
+        bool hasKey(PointDistances& distances, const Point3D& a, const Point3D& b) {
+            return distances.find(a) != distances.end() && distances[a].find(b) != distances[a].end();
+        }
+
+        std::vector<Line3D> calculateDistances(std::vector<Point3D>& points) {
+            std::set<Line3D> distances;
+            for (Point3D point1 : points) {
+                for (Point3D point2 : points) {
+                    if (point1 == point2) {
+                        continue;
+                    }
+                    Line3D line = Line3D({ point1, point2, 0 });
+                    if (distances.find(line) != distances.end()) {
+                        continue;
+                    }
+                    line.dist = distance(line);
+                    distances.insert(line);
+                }
+                cout << ".";
+            }
+            cout << endl << "transforming" << endl;;
+            return std::vector<Line3D>(distances.begin(), distances.end());
+        }
+
+        std::vector<Circut> createCircuts(std::vector<Line3D>& distances, int noConnections = 10) {
+            std::sort(distances.begin(), distances.end(), Line3D::orderByDist);
+
+            // create circuts, connect the 10 shortest
+            std::vector<Circut> circuts;
+            for (int i = 0; i < noConnections; ++i) {
+                Line3D line = distances[i];
+
+                auto hasPoint1 = std::find_if(
+                    circuts.begin(),
+                    circuts.end(),
+                    [&line](auto& circut) {
+                    return std::find(circut.begin(), circut.end(), line.point1) != circut.end();;
                 });
-        }
-        return result;
-    }
+                auto hasPoint2 = std::find_if(
+                    circuts.begin(),
+                    circuts.end(),
+                    [&line](auto& circut) {
+                    return std::find(circut.begin(), circut.end(), line.point2) != circut.end();
+                });
 
-    long distance(Point3D& a, Point3D& b) {
-        return sqrtl(pow(a.x - b.x, 2) + pow(a.y - b.y, 2) + pow(a.z - b.z, 2));
-    }
-
-    long distance(Line3D& line) {
-        return distance(line.point1, line.point2);
-    }
-
-    std::string toString(Point3D p) {
-        return "(" + std::to_string(p.x) + ", " + std::to_string(p.y) + ", " + std::to_string(p.z) + ")";
-    }
-
-    bool hasKey(PointDistances& distances, const Point3D& a, const Point3D& b) {
-        return distances.find(a) != distances.end() && distances[a].find(b) != distances[a].end();
-    }
-
-    std::vector<Line3D> calculateDistances(std::vector<Point3D>& points) {
-        std::set<Line3D> distances;
-        for (Point3D point1 : points) {
-            for (Point3D point2 : points) {
-                if (point1 == point2) {
+                // Has neither
+                if (hasPoint1 == circuts.end() && hasPoint2 == circuts.end()) {
+                    circuts.push_back(Circut({ line.point1, line.point2 }));
                     continue;
                 }
-                Line3D line = Line3D({ point1, point2, 0 });
-                if (distances.find(line) != distances.end()) {
+                // Has point 1, but not point 2
+                int idx1 = hasPoint1 - circuts.begin();
+                if (hasPoint2 == circuts.end()) {
+                    circuts[idx1].push_back(line.point2);
                     continue;
                 }
-                line.dist = distance(line);
-                distances.insert(line);
+                // Has point 2, but not point 1
+                int idx2 = hasPoint2 - circuts.begin();
+                if (hasPoint1 == circuts.end()) {
+                    circuts[idx2].push_back(line.point1);
+                    continue;
+                }
+                // point 1 and point 2 same circut 
+                if (idx1 == idx2) {
+                    //Maybe add again idk???
+                    continue;
+                }
+                // point 1 and point 2 diffirent circut 
+                if (idx1 != idx2) {
+                    hasPoint1->insert(hasPoint1->end(), hasPoint2->begin(), hasPoint2->end());
+                    circuts.erase(hasPoint2);
+                }
             }
-            cout << ".";
-        }
-        cout << endl << "transforming" << endl;;
-        return std::vector<Line3D>(distances.begin(), distances.end());
-    }
 
-    std::vector<Circut> createCircuts(std::vector<Line3D>& distances, int noConnections = 10) {
-        std::sort(distances.begin(), distances.end(), Line3D::orderByDist);
-
-        // create circuts, connect the 10 shortest
-        std::vector<Circut> circuts;
-        for (int i = 0; i < noConnections; ++i) {
-            Line3D line = distances[i];
-
-            auto hasPoint1 = std::find_if(
-                circuts.begin(),
-                circuts.end(),
-                [&line](auto& circut) {
-                return std::find(circut.begin(), circut.end(), line.point1) != circut.end();;
-            });
-            auto hasPoint2 = std::find_if(
-                circuts.begin(),
-                circuts.end(),
-                [&line](auto& circut) {
-                return std::find(circut.begin(), circut.end(), line.point2) != circut.end();
-            });
-
-            // Has neither
-            if (hasPoint1 == circuts.end() && hasPoint2 == circuts.end()) {
-                circuts.push_back(Circut({ line.point1, line.point2 }));
-                continue;
-            }
-            // Has point 1, but not point 2
-            int idx1 = hasPoint1 - circuts.begin();
-            if (hasPoint2 == circuts.end()) {
-                circuts[idx1].push_back(line.point2);
-                continue;
-            }
-            // Has point 2, but not point 1
-            int idx2 = hasPoint2 - circuts.begin();
-            if (hasPoint1 == circuts.end()) {
-                circuts[idx2].push_back(line.point1);
-                continue;
-            }
-            // point 1 and point 2 same circut 
-            if (idx1 == idx2) {
-                //Maybe add again idk???
-                continue;
-            }
-            // point 1 and point 2 diffirent circut 
-            if (idx1 != idx2) {
-                hasPoint1->insert(hasPoint1->end(), hasPoint2->begin(), hasPoint2->end());
-                circuts.erase(hasPoint2);
-            }
+            cout << endl;
+            return circuts;
         }
 
-        cout << endl;
-        return circuts;
-    }
+        long long resultValue(std::vector<Circut>& circuts, int length = 3) {
+        std:set<long> circutSizes;
+            for (auto& circut : circuts) {
+                circutSizes.insert(circut.size());
+            }
+            std::vector<long> orderedCircutSizes(circutSizes.begin(), circutSizes.end());
+            std::sort(orderedCircutSizes.begin(), orderedCircutSizes.end(), greater<long>());
 
-    long long resultValue(std::vector<Circut>& circuts, int length = 3) {
-    std:set<long> circutSizes;
-        for (auto& circut : circuts) {
-            circutSizes.insert(circut.size());
+            long long sum = 1;
+            for (int i = 0; i < length; i++) {
+                sum *= orderedCircutSizes[i];
+            }
+
+            return sum;
         }
-        std::vector<long> orderedCircutSizes(circutSizes.begin(), circutSizes.end());
-        std::sort(orderedCircutSizes.begin(), orderedCircutSizes.end(), greater<long>());
 
-        long long sum = 1;
-        for (int i = 0; i < length; i++) {
-            sum *= orderedCircutSizes[i];
+    public:
+        Solution* part1Test() {
+            std::stringstream stream(TEST_INPUT);
+            std::vector<Point3D> points = parseToPoints(stream);
+            cout << "Points parsed: " << points.size() << endl;
+            std::vector<Line3D> distances = calculateDistances(points);
+            cout << "Distances calculated: " << distances.size() << endl;
+            std::vector<Circut> circuts = createCircuts(distances);
+
+            long long sum = resultValue(circuts);
+
+            cout << "Thats a lot of Mario Kart: " << sum << endl;
+            return this;
+        }
+        // 18699743462400000 -- too high :(
+        // 24 -- not right :(
+        // 14300 -- too low
+        // 42315
+        Solution* part1() {
+            Utils::FileReader reader("inputs/day8.txt");
+            stringstream stream = reader.toStringStream();
+            std::vector<Point3D> points = parseToPoints(stream);
+            cout << "Points parsed: " << points.size() << endl;
+            std::vector<Line3D> distances = calculateDistances(points);
+            cout << "Distances calculated: " << distances.size() << endl;
+            std::vector<Circut> circuts = createCircuts(distances, 1000);
+
+            long long sum = resultValue(circuts);
+
+            cout << "Thats a lot of Mario Kart: " << sum << endl;
+
+            return this;
         }
 
-        return sum;
-    }
+        Solution* part2Test() {
+            std::stringstream stream(TEST_INPUT);
+            std::vector<Point3D> points = parseToPoints(stream);
+            cout << "Points parsed: " << points.size() << endl;
+            std::vector<Line3D> distances = calculateDistances(points);
+            cout << "Distances calculated: " << distances.size() << endl;
+            std::vector<Circut> circuts = createCircuts(distances, distances.size());
 
-public:
-    Day8* part1Test() {
-        std::stringstream stream(TEST_INPUT);
-        std::vector<Point3D> points = parseToPoints(stream);
-        cout << "Points parsed: " << points.size() << endl;
-        std::vector<Line3D> distances = calculateDistances(points);
-        cout << "Distances calculated: " << distances.size() << endl;
-        std::vector<Circut> circuts = createCircuts(distances);
+            long long sum = resultValue(circuts);
 
-        long long sum = resultValue(circuts);
-
-        cout << "Thats a lot of Mario Kart: " << sum << endl;
-        return this;
-    }
-    // 18699743462400000 -- too high :(
-    // 24 -- not right :(
-    // 14300 -- too low
-    // 42315
-    Day8* part1() {
-        FileReader reader("inputs/day8.txt");
-        stringstream stream = reader.toStringStream();
-        std::vector<Point3D> points = parseToPoints(stream);
-        cout << "Points parsed: " << points.size() << endl;
-        std::vector<Line3D> distances = calculateDistances(points);
-        cout << "Distances calculated: " << distances.size() << endl;
-        std::vector<Circut> circuts = createCircuts(distances, 1000);
-
-        long long sum = resultValue(circuts);
-
-        cout << "Thats a lot of Mario Kart: " << sum << endl;
-
-        return this;
-    }
-
-    Day8* part2Test() {
-        std::stringstream stream(TEST_INPUT);
-        std::vector<Point3D> points = parseToPoints(stream);
-        cout << "Points parsed: " << points.size() << endl;
-        std::vector<Line3D> distances = calculateDistances(points);
-        cout << "Distances calculated: " << distances.size() << endl;
-        std::vector<Circut> circuts = createCircuts(distances, distances.size());
-
-        long long sum = resultValue(circuts);
-
-        cout << "Thats a lot of Mario Kart: " << sum << endl;
-        return this;
-    }
-};
+            cout << "Thats a lot of Mario Kart: " << sum << endl;
+            return this;
+        }
+    };
+}

@@ -6,45 +6,43 @@
 #include <string>
 #include <sstream>
 
-class FileReader
-{
+namespace Utils {
+    class FileReader {
 
-private:
-    bool isValid;
-public:
-    std::ifstream* stream;
+    private:
+        bool isValid;
+    public:
+        std::ifstream* stream;
 
-    FileReader(std::string filePath) {
-        stream = new std::ifstream(filePath);
-        if (!(*stream).is_open())
-        {
-            cout << "Unable to open file" << endl;
-            isValid = false;
+        FileReader(std::string filePath) {
+            stream = new std::ifstream(filePath);
+            if (!(*stream).is_open()) {
+                std::cout << "Unable to open file" << std::endl;
+                isValid = false;
+            }
+            else {
+                isValid = true;
+            }
         }
-        else {
-            isValid = true;
+
+        std::string toString() {
+            std::string line;
+            std::string result;
+            while (getline(*stream, line, '\n')) {
+                result += line;
+            }
+            return result;
         }
-    }
 
-    std::string toString()
-    {
-        std::string line;
-        std::string result;
-        while (getline(*stream, line, '\n'))
-        {
-            result += line;
+        std::stringstream toStringStream() {
+            std::stringstream buffer;
+            buffer << (*stream).rdbuf();
+            return buffer;
         }
-        return result;
-    }
 
-    std::stringstream toStringStream() {
-        std::stringstream buffer;
-        buffer << (*stream).rdbuf();
-        return buffer;
-    }
-
-    ~FileReader() {
-        (*stream).close();
-    }
-};
+        ~FileReader() {
+            (*stream).close();
+        }
+    };
+}
 #endif

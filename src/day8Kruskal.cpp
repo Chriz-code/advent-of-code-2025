@@ -5,195 +5,199 @@
 #include <vector>
 #include <map>
 
-//Love my guy kruskal he so smart
-class Day8Kruskal {
-private:
-    const char* TEST_INPUT =
-        "162,817,812\n"
-        "57,618,57\n"
-        "906,360,560\n"
-        "592,479,940\n"
-        "352,342,300\n"
-        "466,668,158\n"
-        "542,29,236\n"
-        "431,825,988\n"
-        "739,650,466\n"
-        "52,470,668\n"
-        "216,146,977\n"
-        "819,987,18\n"
-        "117,168,530\n"
-        "805,96,715\n"
-        "346,949,466\n"
-        "970,615,88\n"
-        "941,993,340\n"
-        "862,61,35\n"
-        "984,92,344\n"
-        "425,690,689";
+namespace Day8 {
+    //Love my guy kruskal he so smart
+    class SolutionKruskal {
+    private:
+        const char* TEST_INPUT =
+            "162,817,812\n"
+            "57,618,57\n"
+            "906,360,560\n"
+            "592,479,940\n"
+            "352,342,300\n"
+            "466,668,158\n"
+            "542,29,236\n"
+            "431,825,988\n"
+            "739,650,466\n"
+            "52,470,668\n"
+            "216,146,977\n"
+            "819,987,18\n"
+            "117,168,530\n"
+            "805,96,715\n"
+            "346,949,466\n"
+            "970,615,88\n"
+            "941,993,340\n"
+            "862,61,35\n"
+            "984,92,344\n"
+            "425,690,689";
 
-    std::vector<Point3D> parseToPoints(std::stringstream& stream) {
-        std::vector<Point3D> result;
-        std::string line;
-        int id = 0;
-        while (getline(stream, line)) {
-            std::vector<std::string> points = StringUtils::split(line, ',');
-            result.push_back({
-                id,
-                std::stol(points[0]),
-                std::stol(points[1]),
-                std::stol(points[2]),
-                });
-            id++;
-        }
-        return result;
-    }
-
-    long distance(Point3D& a, Point3D& b) {
-        return sqrtl(pow(a.x - b.x, 2) + pow(a.y - b.y, 2) + pow(a.z - b.z, 2));
-    }
-
-    DSU kruskal(std::vector<Point3D>& points, int limit) {
-        std::vector<Edge> edges;
-
-        for (int i = 0; i < points.size(); ++i) {
-            for (int j = i + 1; j < points.size(); ++j) {
-                double dist = distance(points[i], points[j]);
-                edges.push_back({ points[i].id, points[j].id, dist });
+        std::vector<Utils::Point3D> parseToPoints(std::stringstream& stream) {
+            std::vector<Utils::Point3D> result;
+            std::string line;
+            int id = 0;
+            while (getline(stream, line)) {
+                std::vector<std::string> points = Utils::StringUtils::split(line, ',');
+                result.push_back({
+                    id,
+                    std::stol(points[0]),
+                    std::stol(points[1]),
+                    std::stol(points[2]),
+                    });
+                id++;
             }
+            return result;
         }
 
-        sort(edges.begin(), edges.end());
-
-        DSU dsu(points.size());
-
-        int edgesCount = 0;
-        for (auto& edge : edges) {
-            if (dsu.find(edge.src) != dsu.find(edge.dest)) {
-                dsu.unite(edge.src, edge.dest);
-            }
-            edgesCount++;
-            if (edgesCount >= limit) {
-                break;
-            }
+        long distance(Utils::Point3D& a, Utils::Point3D& b) {
+            return sqrtl(pow(a.x - b.x, 2) + pow(a.y - b.y, 2) + pow(a.z - b.z, 2));
         }
 
-        return dsu;
-    }
+        Utils::DSU kruskal(std::vector<Utils::Point3D>& points, int limit) {
+            std::vector<Utils::Edge> edges;
 
-    std::vector<int> groupSizes(std::vector<Point3D>& points, DSU& dsu) {
-        std::map<int, std::vector<int>> groups;
-
-        for (auto& point : points) {
-            int id = dsu.find(point.id);
-            groups[id].push_back(point.id);
-        }
-
-        std::vector<int> result;
-        for (auto& pair : groups) {
-            result.push_back(pair.second.size());
-        }
-
-        std::sort(result.begin(), result.end(), greater<int>());
-
-        return result;
-    }
-
-    Edge kruskalReturnLastEdge(vector<Point3D>& points) {
-        std::vector<Edge> edges;
-
-        for (int i = 0; i < points.size(); ++i) {
-            for (int j = i + 1; j < points.size(); ++j) {
-                double dist = distance(points[i], points[j]);
-                edges.push_back({ points[i].id, points[j].id,  dist });
-            }
-        }
-
-        sort(edges.begin(), edges.end());
-
-        DSU dsu(points.size());
-
-        Edge lastEdge = { -1, -1, -1.0 };
-        for (auto& edge : edges) {
-
-            if (dsu.find(edge.src) != dsu.find(edge.dest)) {
-
-                if (dsu.getNumComponents() == 2) {
-                    lastEdge = edge;
+            for (int i = 0; i < points.size(); ++i) {
+                for (int j = i + 1; j < points.size(); ++j) {
+                    double dist = distance(points[i], points[j]);
+                    edges.push_back({ points[i].id, points[j].id, dist });
                 }
-                dsu.unite(edge.src, edge.dest);
+            }
 
-                if (dsu.getNumComponents() == 1) {
+            sort(edges.begin(), edges.end());
+
+            Utils::DSU dsu(points.size());
+
+            int edgesCount = 0;
+            for (auto& edge : edges) {
+                if (dsu.find(edge.src) != dsu.find(edge.dest)) {
+                    dsu.unite(edge.src, edge.dest);
+                }
+                edgesCount++;
+                if (edgesCount >= limit) {
                     break;
                 }
             }
+
+            return dsu;
         }
 
-        return lastEdge;
-    }
+        std::vector<int> groupSizes(std::vector<Utils::Point3D>& points, Utils::DSU& dsu) {
+            std::map<int, std::vector<int>> groups;
 
-    void printGroups(std::vector<int> groups) {
-        for (auto& group : groups) {
-            if (group == 1) {
-                continue;
+            for (auto& point : points) {
+                int id = dsu.find(point.id);
+                groups[id].push_back(point.id);
             }
-            cout << group << endl;
+
+            std::vector<int> result;
+            for (auto& pair : groups) {
+                result.push_back(pair.second.size());
+            }
+
+            std::sort(result.begin(), result.end(), std::greater<int>());
+
+            return result;
         }
-    }
 
-public:
-    Day8Kruskal* part1Test() {
-        std::stringstream stream(TEST_INPUT);
-        std::vector<Point3D> points = parseToPoints(stream);
+        Utils::Edge kruskalReturnLastEdge(std::vector<Utils::Point3D>& points) {
+            std::vector<Utils::Edge> edges;
 
-        DSU finalDSU = kruskal(points, 10);
+            for (int i = 0; i < points.size(); ++i) {
+                for (int j = i + 1; j < points.size(); ++j) {
+                    double dist = distance(points[i], points[j]);
+                    edges.push_back({ points[i].id, points[j].id,  dist });
+                }
+            }
 
-        std::vector<int> groups = groupSizes(points, finalDSU);
-        printGroups(groups);
+            sort(edges.begin(), edges.end());
 
-        return this;
-    }
+            Utils::DSU dsu(points.size());
 
-    Day8Kruskal* part1() {
-        FileReader reader("inputs/day8.txt");
-        stringstream stream = reader.toStringStream();
-        std::vector<Point3D> points = parseToPoints(stream);
+            Utils::Edge lastEdge = { -1, -1, -1.0 };
+            for (auto& edge : edges) {
 
-        DSU finalDSU = kruskal(points, 1000);
+                if (dsu.find(edge.src) != dsu.find(edge.dest)) {
 
-        std::vector<int> groups = groupSizes(points, finalDSU);
+                    if (dsu.getNumComponents() == 2) {
+                        lastEdge = edge;
+                    }
+                    dsu.unite(edge.src, edge.dest);
 
-        cout << "Thats a lot of Mario Kart: " << (groups[0] * groups[1] * groups[2]) << endl;
+                    if (dsu.getNumComponents() == 1) {
+                        break;
+                    }
+                }
+            }
 
-        return this;
-    }
+            return lastEdge;
+        }
 
-    Day8Kruskal* part2Test() {
-        std::stringstream stream(TEST_INPUT);
-        std::vector<Point3D> points = parseToPoints(stream);
+        void printGroups(std::vector<int> groups) {
+            for (auto& group : groups) {
+                if (group == 1) {
+                    continue;
+                }
+                std::cout << group << std::endl;
+            }
+        }
 
-        Edge finalEdge = kruskalReturnLastEdge(points);
+    public:
+        SolutionKruskal* part1Test() {
+            std::stringstream stream(TEST_INPUT);
+            std::vector<Utils::Point3D> points = parseToPoints(stream);
 
-        Point3D src = points[finalEdge.src];
-        Point3D dest = points[finalEdge.dest];
-        cout << "The last edge added" << endl;
-        cout << "Point: " << finalEdge.src << " " << Point3D::toString(src)
-            << " and Point: " << finalEdge.dest << " " << Point3D::toString(dest)
-            << endl;
-        cout << "Thats a lot of Mario Kart: " << (src.x * dest.x) << endl;
+            Utils::DSU finalDSU = kruskal(points, 10);
 
-        return this;
-    }
+            std::vector<int> groups = groupSizes(points, finalDSU);
+            printGroups(groups);
 
-    Day8Kruskal* part2() {
-        FileReader reader("inputs/day8.txt");
-        stringstream stream = reader.toStringStream();
-        std::vector<Point3D> points = parseToPoints(stream);
+            return this;
+        }
 
-        Edge finalEdge = kruskalReturnLastEdge(points);
+        SolutionKruskal* part1() {
+            Utils::FileReader reader("inputs/day8.txt");
+            std::stringstream stream = reader.toStringStream();
+            std::vector<Utils::Point3D> points = parseToPoints(stream);
 
-        Point3D src = points[finalEdge.src];
-        Point3D dest = points[finalEdge.dest];
-        cout << "Thats a lot of Mario Kart: " << ((long long)src.x * dest.x) << endl;
+            Utils::DSU finalDSU = kruskal(points, 1000);
 
-        return this;
-    }
-};
+            std::vector<int> groups = groupSizes(points, finalDSU);
+
+            std::cout << "Thats a lot of Mario Kart: " << (groups[0] * groups[1] * groups[2]) << std::endl;
+
+            return this;
+        }
+
+        SolutionKruskal* part2Test() {
+            std::stringstream stream(TEST_INPUT);
+            std::vector<Utils::Point3D> points = parseToPoints(stream);
+
+            Utils::Edge finalEdge = kruskalReturnLastEdge(points);
+
+            Utils::Point3D src = points[finalEdge.src];
+            Utils::Point3D dest = points[finalEdge.dest];
+            std::cout << "The last edge added" << std::endl;
+            std::cout << "Point: " << finalEdge.src << " " << Utils::Point3D::toString(src)
+                << " and Point: " << finalEdge.dest << " " << Utils::Point3D::toString(dest)
+                << std::endl;
+            std::cout << "Thats a lot of Mario Kart: " << (src.x * dest.x) << std::endl;
+
+            return this;
+        }
+
+        SolutionKruskal* part2() {
+            Utils::FileReader reader("inputs/day8.txt");
+            std::stringstream stream = reader.toStringStream();
+            std::vector<Utils::Point3D> points = parseToPoints(stream);
+
+            Utils::Edge finalEdge = kruskalReturnLastEdge(points);
+
+            Utils::Point3D src = points[finalEdge.src];
+            Utils::Point3D dest = points[finalEdge.dest];
+            std::cout << "Thats a lot of Mario Kart: " << ((long long)src.x * dest.x) << std::endl;
+
+            return this;
+        }
+    };
+
+}
+
