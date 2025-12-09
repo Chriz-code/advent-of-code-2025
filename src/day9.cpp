@@ -12,16 +12,16 @@ namespace Day9 {
 
     struct Point2D {
         int id;
-        llong x, y;
+        llong row, col;
 
         bool operator < (const Point2D& other) const {
             return id < other.id;
         }
 
         static bool sortBySize(const Point2D& p1, const Point2D& p2) {
-            if (p1.x > p2.x)
+            if (p1.row > p2.row)
                 return true;
-            return p1.y > p2.y;
+            return p1.col > p2.col;
         }
     };
 
@@ -45,9 +45,9 @@ namespace Day9 {
             int id = 0;
             while (getline(stream, line)) {
                 std::vector<std::string> numbers = Utils::StringUtils::split(line, ',');
-                llong x = stoll(numbers[0]);
-                llong y = stoll(numbers[1]);
-                points.push_back({ id, x, y });
+                llong col = stoll(numbers[0]);
+                llong row = stoll(numbers[1]);
+                points.push_back({ id, row, col });
                 id++;
             }
             return points;
@@ -86,20 +86,18 @@ namespace Day9 {
         }
 
         static bool isInsideAxisAligned(Point2D p, Point2D corner1, Point2D corner2) {
-            int minX = std::min(corner1.x, corner2.x) + 1;
-            int maxX = std::max(corner1.x, corner2.x) + 1;
-            int minY = std::min(corner1.y, corner2.y) + 1;
-            int maxY = std::max(corner1.y, corner2.y) + 1;
-            return (p.x >= minX && p.x <= maxX) && (p.y >= minY && p.y <= maxY);
+            int minR = std::min(corner1.row, corner2.row);
+            int maxR = std::max(corner1.row, corner2.row);
+            int minC = std::min(corner1.col, corner2.col);
+            int maxC = std::max(corner1.col, corner2.col);
+            return (p.row >= minR && p.row <= maxR) && (p.col >= minC && p.col <= maxC);
         }
 
     public:
         Solution* part1Test() {
             std::stringstream stream(TEST_INPUT);
             std::vector<Point2D> points = getPoints(stream);
-            std::sort(points.begin(), points.end(), Point2D::sortBySize);
-            int size = std::max(points[0].x, points[0].y);
-            Utils::Matrix2D<char> matrix = Utils::Matrix2D<char>(size, size, '.');
+            Utils::Matrix2D<char> matrix = Utils::Matrix2D<char>(9, 14, '.');
 
             std::vector<Edge2D> uniquePointSets = getUniquePointSets(points);
             matrix.navigateLTR([&uniquePointSets, &matrix](int row, int col, char c) {
@@ -107,7 +105,7 @@ namespace Day9 {
                     return;
                 }
                 for (auto& edge : uniquePointSets) {
-                    if (isInsideAxisAligned({ 0, row, col }, edge.first, edge.second)) {
+                    if (isInsideAxisAligned({ -1, row, col }, edge.first, edge.second)) {
                         matrix[row][col] = 'O';
                         return;
                     }

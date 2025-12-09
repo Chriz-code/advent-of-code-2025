@@ -51,9 +51,9 @@ namespace Utils {
         }
 
         void draw(char separator = ',') {
-            for (int row = 0; row < rows; row++) {
+            for (int row = 0; row < rows; ++row) {
                 std::cout << "[";
-                for (int col = 0; col < columns; col++) {
+                for (int col = 0; col < columns; ++col) {
                     std::cout << data[row][col];
                     if (!(col == columns - 1)) {
                         std::cout << separator;
