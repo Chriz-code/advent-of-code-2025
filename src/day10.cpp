@@ -12,6 +12,8 @@ namespace Day10 {
         std::function<std::vector<std::string>(std::string, char)> split = Utils::StringUtils::split;
 
         std::string src;
+        std::string goal;
+
         std::string display;
         std::vector<Button> buttons;
         std::vector<int> joltage;
@@ -47,7 +49,9 @@ namespace Day10 {
         Machine(std::string line) {
             std::vector<std::string> parts = split(line, ' ');
             src = line;
-            display = *parts.begin();
+            goal = *parts.begin();
+            display = goal;
+            replace(display.begin(), display.end(), '#', '.');
             buttons = to_buttons(std::vector<std::string>(parts.begin() + 1, parts.end() - 1));
             joltage = toJoltage(parts.back());
         }
