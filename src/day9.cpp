@@ -17,8 +17,8 @@ namespace Day9 {
         }
 
         void moveTowards(Point2D& p) {
-            row += std::clamp(p.row - row, -1, 1);
-            col += std::clamp(p.col - col, -1, 1);
+            //row += std::clamp(p.row - row, -1, 1);
+            //col += std::clamp(p.col - col, -1, 1);
         }
     };
 

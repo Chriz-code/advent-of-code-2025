@@ -9,6 +9,10 @@ namespace Utils {
     public:
         static std::vector<std::string> split(std::string value, char delimiter) {
             std::vector<std::string> result;
+            if (value.find(delimiter) >= value.size()) {
+                result.push_back(value);
+                return result;
+            }
             std::stringstream stream(value);
             std::string line;
             while (getline(stream, line, delimiter)) {
