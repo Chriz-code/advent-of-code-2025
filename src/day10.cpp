@@ -1,31 +1,37 @@
 #include "utils/stringutils.cpp"
+#include "utils/filereader.cpp"
 #include <string>
 #include <vector>
 #include <functional>
 #include <sstream>
+#include <queue>
+#include <unordered_map>
+#include <unordered_set>
+#include <algorithm>
 
 namespace Day10 {
-    class Machine {
-        typedef std::vector<int> Button;
+    using namespace std;
+    using button = vector<int>;
 
+    class machine {
     private:
-        std::function<std::vector<std::string>(std::string, char)> split = Utils::StringUtils::split;
+        function<vector<string>(string, char)> split = Utils::StringUtils::split;
 
-        std::string src;
-        std::string goal;
+        string _src;
+        string _goal;
 
-        std::string display;
-        std::vector<Button> buttons;
-        std::vector<int> joltage;
+        string _display;
+        vector<button> _buttons;
+        vector<int> _joltage;
 
-        std::vector<Button> to_buttons(std::vector<std::string> parts) {
+        vector<button> to_buttons(vector<string> parts) {
             using namespace std;
 
-            vector<Button> result;
+            vector<button> result;
             for (auto& p : parts) {
                 p.erase(remove(p.begin(), p.end(), '('), p.end());
                 p.erase(remove(p.begin(), p.end(), ')'), p.end());
-                Button button;
+                button button;
                 vector<string> nums = split(p, ',');
                 for (auto& n : nums) {
                     button.push_back(stoi(n));
@@ -35,8 +41,8 @@ namespace Day10 {
             return result;
         }
 
-        std::vector<int> toJoltage(std::string joltages) {
-            std::vector<int> result;
+        vector<int> to_joltage(string joltages) {
+            vector<int> result;
             joltages.erase(remove(joltages.begin(), joltages.end(), '{'), joltages.end());
             joltages.erase(remove(joltages.begin(), joltages.end(), '}'), joltages.end());
             for (auto& s : split(joltages, ',')) {
@@ -45,33 +51,114 @@ namespace Day10 {
             return result;
         }
 
+        vector<pair<string, button>> next_states(const string& current) {
+            vector<pair<string, button>> actions;
+            for (auto& b : _buttons) {
+                string next = current;
+                for (auto& t : b) {
+                    // plus 1 to skip '['
+                    next[t + 1] = (next[t + 1] == '.') ? '#' : '.';
+                }
+                actions.push_back({ next, b });
+            }
+            return actions;
+        }
+
     public:
-        Machine(std::string line) {
-            std::vector<std::string> parts = split(line, ' ');
-            src = line;
-            goal = *parts.begin();
-            display = goal;
-            replace(display.begin(), display.end(), '#', '.');
-            buttons = to_buttons(std::vector<std::string>(parts.begin() + 1, parts.end() - 1));
-            joltage = toJoltage(parts.back());
+        machine(string line) {
+            vector<string> parts = split(line, ' ');
+            _src = line;
+            _goal = *parts.begin();
+            _display = _goal;
+            replace(_display.begin(), _display.end(), '#', '.');
+            _buttons = to_buttons(vector<string>(parts.begin() + 1, parts.end() - 1));
+            _joltage = to_joltage(parts.back());
+        }
+
+        int distance_to(const string node) {
+            int distance = 0;
+            for (int i = 0; i < min(_goal.length(), node.length()); ++i) {
+                if (_goal[i] != node[i]) {
+                    distance++;
+                }
+            }
+            int gl = _goal.length();
+            int nl = node.length();
+            return distance += abs(gl - nl);
+        }
+
+        int bfs() {
+            queue<string> q;
+            unordered_map<string, string> parent;
+            unordered_set<string> visited;
+            vector<string> path;
+
+            q.push(_display);
+            visited.insert(_display);
+            parent[_display] = "";
+
+            bool found = false;
+            while (!q.empty()) {
+                string curr = q.front();
+                q.pop();
+                if (curr == _goal) {
+                    found = true;
+                    break;
+                }
+                for (auto& neighboor : next_states(curr)) {
+                    if (visited.find(neighboor.first) == visited.end()) {
+                        visited.insert(neighboor.first);
+                        parent[neighboor.first] = curr;
+                        q.push(neighboor.first);
+                    }
+                }
+
+            }
+
+            if (found) {
+                string curr = _goal;
+                while (!(curr == "")) {
+                    path.push_back(curr);
+                    curr = parent[curr];
+                }
+                reverse(path.begin(), path.end());
+            }
+            return path.size() - 1;
         }
     };
 
 
-    class Solution {
+    class solution {
     private:
         const char* TEST_INPUT =
             "[.##.] (3) (1,3) (2) (2,3) (0,2) (0,1) {3,5,4,7}\n"
             "[...#.] (0,2,3,4) (2,3) (0,4) (0,1,2) (1,2,3,4) {7,5,12,7,2}\n"
             "[.###.#] (0,1,2,3,4) (0,3,4) (0,1,2,4,5) (1,2) {10,11,11,5,10,5}";
     public:
-        Solution* part1Test() {
-            std::stringstream stream(TEST_INPUT);
-            std::vector<Machine> machines;
-            std::string line;
+        solution* part1Test() {
+            stringstream stream(TEST_INPUT);
+            vector<machine> machines;
+            string line;
+            long long sum = 0;
             while (getline(stream, line)) {
-                machines.push_back(Machine(line));
+                machine m(line);
+                sum += m.bfs();
             }
+            cout << "I'm so tired of this: " << sum;
+            return this;
+        }
+
+        solution* part1() {
+            Utils::FileReader reader("inputs/day10.txt");
+            stringstream stream = reader.toStringStream();
+            vector<machine> machines;
+            string line;
+            long long sum = 0;
+            while (getline(stream, line)) {
+                machine m(line);
+                sum += m.bfs();
+            }
+            cout << "I'm so tired of this: " << sum;
             return this;
         }
     };
