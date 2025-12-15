@@ -12,7 +12,7 @@ _deps
 CMakeUserPresets.json
 
 out/
-
+inputs/
 # Prerequisites
 *.d
 
