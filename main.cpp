@@ -9,6 +9,7 @@
 #include "src/day9.cpp"
 #include "src/day10.cpp"
 #include "src/day11.cpp"
+#include "src/day12.cpp"
 
 int main(int, char**){
     std::cout << "Hello, from advent-of-code-2025!\n";
@@ -57,7 +58,11 @@ int main(int, char**){
     //day10.part1Test();
     //day10.part1();
 
-    Day11::Solution day11;
-    day11.part1Test();
-    day11.part1();
+    //Day11::Solution day11;
+    //day11.part1Test();
+    //day11.part1();
+
+    Day12::Solution day12;
+    //day12.part1Test();
+    day12.part1();
 }
