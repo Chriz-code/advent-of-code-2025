@@ -59,4 +59,5 @@ int main(int, char**){
 
     Day11::Solution day11;
     day11.part1Test();
+    day11.part1();
 }
