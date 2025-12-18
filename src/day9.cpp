@@ -7,12 +7,39 @@
 #include <set>
 #include <algorithm>
 #include <ostream>
+#include <unordered_map>
+#include <queue>
 
 namespace Day9 {
     class Solution {
-        struct Point2D {
+        using u64 = long long;
+        
+        struct test {
+            const char* INPUT =
+                "7,1\n"
+                "11,1\n"
+                "11,7\n"
+                "9,7\n"
+                "9,5\n"
+                "2,5\n"
+                "2,3\n"
+                "7,3";
+        };
+
+        struct basePoint2D {
+            int col = -1, row = -1;
+        };
+
+        static u64 calcArea(basePoint2D& topLeft, basePoint2D& bottomRight) {
+            u64 w = abs(bottomRight.row - topLeft.row) + 1;
+            u64 l = abs(bottomRight.col - topLeft.col) + 1;
+            return w * l;
+        }
+
+        struct Point2D : basePoint2D {
             int id;
-            int row, col;
+
+            Point2D(int id = -1, int row = -1, int col = -1) : id(id), basePoint2D({ row, col }) {}
 
             bool operator < (const Point2D& other) const {
                 return id < other.id;
@@ -34,6 +61,8 @@ namespace Day9 {
 
         typedef std::pair<Point2D, Point2D> Edge2D;
 
+        test t;
+
         static bool isPoint(std::vector<Point2D>& points, int row, int col) {
             Point2D p2({ row, col });
             for (auto& p1 : points) {
@@ -50,12 +79,6 @@ namespace Day9 {
             int minC = std::min(corner1.col, corner2.col);
             int maxC = std::max(corner1.col, corner2.col);
             return (p.row >= minR && p.row <= maxR) && (p.col >= minC && p.col <= maxC);
-        }
-
-        static long long calcArea(Point2D& topLeft, Point2D& bottomRight) {
-            long long w = abs(bottomRight.row - topLeft.row) + 1;
-            long long l = abs(bottomRight.col - topLeft.col) + 1;
-            return w * l;
         }
 
         static std::vector<Edge2D> getUniquePointSets(std::vector<Point2D>& points) {
@@ -79,16 +102,6 @@ namespace Day9 {
             }
             return std::vector<Edge2D>(uniques.begin(), uniques.end());
         }
-
-        const char* TEST_INPUT =
-            "7,1\n"
-            "11,1\n"
-            "11,7\n"
-            "9,7\n"
-            "9,5\n"
-            "2,5\n"
-            "2,3\n"
-            "7,3";
 
         std::vector<Point2D> getPoints(std::stringstream& stream) {
             std::string line;
@@ -152,11 +165,11 @@ namespace Day9 {
 
     public:
         Solution* part1Test() {
-            std::stringstream stream(TEST_INPUT);
+            std::stringstream stream(t.INPUT);
             std::vector<Point2D> points = getPoints(stream);
             std::vector<Edge2D> uniquePointSets = getUniquePointSets(points);
 
-            long long area = 0;
+            u64 area = 0;
             for (auto& p : uniquePointSets) {
                 area = std::max(
                     area,
@@ -164,21 +177,6 @@ namespace Day9 {
                 );
             }
             std::cout << area << std::endl;
-
-            //Utils::Matrix2D<char> matrix = Utils::Matrix2D<char>(9, 14, '.');
-            //matrix.navigateLTR([&uniquePointSets, &matrix](int row, int col, char c) {
-            //    if (c == 'O') {
-            //        return;
-            //    }
-            //    for (auto& edge : uniquePointSets) {
-            //        if (isInsideAxisAligned({ -1, row, col }, edge.first, edge.second)) {
-            //            matrix[row][col] = 'O';
-            //            return;
-            //        }
-            //    }
-            //});
-//
-            //matrix.draw(' ');
             return this;
         }
 
@@ -189,7 +187,7 @@ namespace Day9 {
 
             std::vector<Edge2D> uniquePointSets = getUniquePointSets(points);
 
-            long long area = 0;
+            u64 area = 0;
             for (auto& p : uniquePointSets) {
                 area = std::max(
                     area,
@@ -199,49 +197,5 @@ namespace Day9 {
             std::cout << area << std::endl;
             return this;
         }
-
-        Solution* part2Test() {
-            std::stringstream stream(TEST_INPUT);
-            std::vector<Point2D> points = getPoints(stream);
-
-            Utils::Matrix2D<char> matrix = Utils::Matrix2D<char>(9, 14, '.');
-            drawBordersOn(matrix, points);
-            fillBorders(matrix);
-
-            //std::vector<Edge2D> uniquePointSets = getUniquePointSets(points);
-
-
-            matrix.draw(' ');
-            return this;
-        }
-
-        Solution* part2() {
-            Utils::FileReader reader("inputs/day9.txt");
-            std::stringstream stream = reader.toStringStream();
-            std::vector<Point2D> points = getPoints(stream);
-
-            //This is a bad solution I think..
-
-            Utils::Matrix2D<char> matrix = Utils::Matrix2D<char>(100000, 100000, '.');
-            drawBordersOn(matrix, points);
-            //fillBorders(matrix);
-
-            //std::vector<Edge2D> uniquePointSets = getUniquePointSets(points);
-
-
-            matrix.draw(' ');
-            return this;
-        }
-    };
-
-    class CompressionSolution {
-        struct Point2D {
-            int x = -1, y = -1;
-            Point2D(const int x, const int y) : x(x), y(y) {}
-            friend std::ostream& operator<<(std::ostream& os, const Point2D& p) {
-                os << "(" << p.x << "," << p.y << ")";
-                return os;
-            }
-        };
     };
 }

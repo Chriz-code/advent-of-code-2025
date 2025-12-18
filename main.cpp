@@ -7,9 +7,11 @@
 #include "src/day7.cpp"
 #include "src/day8Kruskal.cpp"
 #include "src/day9.cpp"
+#include "src/day9-compress.cpp"
 #include "src/day10.cpp"
 #include "src/day11.cpp"
 #include "src/day12.cpp"
+
 
 int main(int, char**){
     std::cout << "Hello, from advent-of-code-2025!\n";
@@ -48,11 +50,12 @@ int main(int, char**){
     //day8.part2Test();
     //day8.part2();
 
-    Day9::Solution day9;
-    //day9.part1Test();
-    //day9.part1();
-    day9.part2Test();
-    day9.part2();
+    Day9::Solution day9p1;
+    //day9p1.part1Test();
+    //day9p1.part1();
+    Day9::CompressionSolution day9p2;
+    //day9p2.part2Test();
+    day9p2.part2();
 
     //Day10::Solution day10;
     //day10.part1Test();
