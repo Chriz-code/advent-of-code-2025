@@ -48,21 +48,21 @@ int main(int, char**){
     //day8.part2Test();
     //day8.part2();
 
-    //Day9::Solution day9;
+    Day9::Solution day9;
     //day9.part1Test();
     //day9.part1();
-    //day9.part2Test();
-    //day9.part2();
+    day9.part2Test();
+    day9.part2();
 
     //Day10::Solution day10;
     //day10.part1Test();
     //day10.part1();
 
-    Day11::Solution day11;
+    //Day11::Solution day11;
     //day11.part1Test();
     //day11.part1();
     //day11.part2Test();
-    day11.part2();
+    //day11.part2();
 
     //Day12::Solution day12;
     //day12.part1Test();

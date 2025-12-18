@@ -6,34 +6,34 @@
 #include <cmath>
 #include <set>
 #include <algorithm>
+#include <ostream>
 
 namespace Day9 {
-    struct Point2D {
-        int id;
-        int row, col;
-
-        bool operator < (const Point2D& other) const {
-            return id < other.id;
-        }
-
-        void moveTowards(Point2D& p) {
-            //row += std::clamp(p.row - row, -1, 1);
-            //col += std::clamp(p.col - col, -1, 1);
-        }
-    };
-
-    struct PointPositionIsGreater {
-        bool operator()(const Point2D& p1, const Point2D& p2) const {
-            if (std::max(p1.row, p1.col) > std::max(p2.row, p2.col))
-                return true;
-            return false;
-        }
-    };
-
-    typedef std::pair<Point2D, Point2D> Edge2D;
-
     class Solution {
-    private:
+        struct Point2D {
+            int id;
+            int row, col;
+
+            bool operator < (const Point2D& other) const {
+                return id < other.id;
+            }
+
+            void moveTowards(Point2D& p) {
+                //row += std::clamp(p.row - row, -1, 1);
+                //col += std::clamp(p.col - col, -1, 1);
+            }
+        };
+
+        struct PointPositionIsGreater {
+            bool operator()(const Point2D& p1, const Point2D& p2) const {
+                if (std::max(p1.row, p1.col) > std::max(p2.row, p2.col))
+                    return true;
+                return false;
+            }
+        };
+
+        typedef std::pair<Point2D, Point2D> Edge2D;
+
         static bool isPoint(std::vector<Point2D>& points, int row, int col) {
             Point2D p2({ row, col });
             for (auto& p1 : points) {
@@ -232,5 +232,16 @@ namespace Day9 {
             matrix.draw(' ');
             return this;
         }
+    };
+
+    class CompressionSolution {
+        struct Point2D {
+            int x = -1, y = -1;
+            Point2D(const int x, const int y) : x(x), y(y) {}
+            friend std::ostream& operator<<(std::ostream& os, const Point2D& p) {
+                os << "(" << p.x << "," << p.y << ")";
+                return os;
+            }
+        };
     };
 }
