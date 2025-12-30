@@ -8,7 +8,8 @@
 #include "src/day8Kruskal.cpp"
 #include "src/day9.cpp"
 #include "src/day9-compress.cpp"
-#include "src/day10.cpp"
+//#include "src/day10.cpp"
+#include "src/day10-z3.cpp"
 #include "src/day11.cpp"
 #include "src/day12.cpp"
 
@@ -50,16 +51,18 @@ int main(int, char**){
     //day8.part2Test();
     //day8.part2();
 
-    Day9::Solution day9p1;
+    //Day9::Solution day9p1;
     //day9p1.part1Test();
     //day9p1.part1();
-    Day9::CompressionSolution day9p2;
+    //Day9::CompressionSolution day9p2;
     //day9p2.part2Test();
-    day9p2.part2();
+    //day9p2.part2();
 
     //Day10::Solution day10;
     //day10.part1Test();
     //day10.part1();
+    Day10::z3solution day10z3;
+    day10z3.part2();
 
     //Day11::Solution day11;
     //day11.part1Test();
